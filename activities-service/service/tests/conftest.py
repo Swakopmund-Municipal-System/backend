@@ -59,6 +59,11 @@ def test_db():
         session.add_all(images)
         session.commit()
 
+        # Reset the sequence for the images table
+        session.execute(
+            text("SELECT setval('images_id_seq', (SELECT MAX(id) FROM images))")
+        )
+
         # test get all images
         images = session.query(Image).all()
         assert len(images) == 2, "Failed to seed images"

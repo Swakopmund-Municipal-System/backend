@@ -63,55 +63,53 @@ def search_activities(
 
 def create_activity(db: Session, data: ActivityCreateDTO) -> tuple[Activity, int, str]:
     try:
-        with db.begin():
-            hero_image_data = None
-            if data.hero_image != None:
-                hero_image_data = Image(
-                    name=data.hero_image.filename,
-                    filepath=uuid.uuid4().hex.replace("-", "")
-                    + data.hero_image.filename,
-                )
-                db.add(hero_image_data)
-                db.flush()
-
-                fileSavePath = f"uploads/{hero_image_data.filepath}"
-                with open(fileSavePath, "wb") as f:
-                    f.write(data.hero_image.file.read())
-
-            activity_data = Activity(
-                name=data.name,
-                description=data.description,
-                address=data.address,
-                created_by=uuid.uuid4(),
-                updated_by=uuid.uuid4(),
-                booking_url=data.booking_url,
-                hero_image_id=hero_image_data.id if hero_image_data else None,
-                latitude=data.latitude,
-                longitude=data.longitude,
-                point_geom=f"SRID=4326;POINT({data.longitude} {data.latitude})",
+        hero_image_data = None
+        if data.hero_image != None:
+            hero_image_data = Image(
+                name=data.hero_image.filename,
+                filepath=uuid.uuid4().hex.replace("-", "") + data.hero_image.filename,
             )
-            db.add(activity_data)
+            db.add(hero_image_data)
             db.flush()
 
-            for image in data.files:
-                image_data = Image(
-                    name=image.filename,
-                    content_type=image.content_type,
-                    data=image.file.read(),
-                )
-                db.add(image_data)
-                db.flush()
+            fileSavePath = f"uploads/{hero_image_data.filepath}"
+            with open(fileSavePath, "wb") as f:
+                f.write(data.hero_image.file.read())
 
-                activity_image_data = ActivityImage(
-                    image_id=image_data.id,
-                    activity_id=activity_data.id,
-                )
-                db.add(activity_image_data)
-                db.flush()
+        activity_data = Activity(
+            name=data.name,
+            description=data.description,
+            address=data.address,
+            created_by=uuid.uuid4(),
+            updated_by=uuid.uuid4(),
+            booking_url=data.booking_url,
+            hero_image_id=hero_image_data.id if hero_image_data else None,
+            latitude=data.latitude,
+            longitude=data.longitude,
+            point_geom=f"SRID=4326;POINT({data.longitude} {data.latitude})",
+        )
+        db.add(activity_data)
+        db.flush()
 
-            db.commit()
+        for image in data.files:
+            image_data = Image(
+                name=image.filename,
+                filepath=uuid.uuid4().hex.replace("-", "") + image.filename,
+            )
+            db.add(image_data)
+            db.flush()
 
-            return activity_data, 200, "Activity created successfully"
+            activity_image_data = ActivityImage(
+                image_id=image_data.id,
+                activity_id=activity_data.id,
+            )
+            db.add(activity_image_data)
+            db.flush()
+
+        db.commit()
+
+        return activity_data, 200, "Activity created successfully"
     except Exception as e:
+        db.rollback()
         print(f"Error creating activity: {e}")
         return None, 500, str(e)
