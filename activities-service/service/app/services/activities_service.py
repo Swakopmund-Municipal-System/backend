@@ -61,7 +61,7 @@ def search_activities(
         return []
 
 
-def create_activity(db: Session, data: ActivityCreateDTO) -> tuple[Activity, int, str]:
+def create_activity(db: Session, data: ActivityCreateDTO) -> tuple[int, int, str]:
     try:
         hero_image_data = None
         if data.hero_image != None:
@@ -108,7 +108,7 @@ def create_activity(db: Session, data: ActivityCreateDTO) -> tuple[Activity, int
 
         db.commit()
 
-        return activity_data, 200, "Activity created successfully"
+        return activity_data.id, 201, "Activity created successfully"
     except Exception as e:
         db.rollback()
         print(f"Error creating activity: {e}")

@@ -116,6 +116,11 @@ def test_db():
         session.add_all(activity_images)
         session.commit()
 
+        # reset the sequence for the activities table
+        session.execute(
+            text("SELECT setval('activities_id_seq', (SELECT MAX(id) FROM activities))")
+        )
+
         # ------ end of seeding ------
 
         yield session

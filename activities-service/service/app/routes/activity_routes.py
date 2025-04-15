@@ -49,13 +49,13 @@ async def create_new_activity(
     except ValidationError as e:
         raise HTTPException(status_code=400, detail=e.errors())
 
-    (created_activity, status_code, err_message) = create_activity(db, activity_data)
+    (created_activity_id, status_code, err_message) = create_activity(db, activity_data)
     if status_code != 201:
         raise HTTPException(status_code=status_code, detail=err_message)
 
     return JSONResponse(
         status_code=201,
-        content=created_activity,
+        content=created_activity_id,
     )
 
 

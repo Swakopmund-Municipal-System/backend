@@ -28,8 +28,7 @@ def test_create_activity_success(client):
 
     assert response.status_code == 201
     data = response.json()
-    assert data["name"] == "Test Activity"
-    assert data["address"] == "123 Test Street"
+    assert data > 0
 
 
 def test_create_activity_missing_required_field(client):
@@ -88,4 +87,4 @@ def test_create_activity_multiple_files(client):
 
     assert response.status_code == 201
     data = response.json()
-    assert data["name"] == "Gallery Event"
+    assert data > 0
