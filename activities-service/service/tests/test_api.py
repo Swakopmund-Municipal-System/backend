@@ -1,0 +1,58 @@
+import pytest
+from fastapi.testclient import TestClient
+
+
+def test_get_activities___success_no_filters(client):
+    response = client.get(
+        "/activities",
+        params={
+            "search_term": "",
+            "sort_field": "",
+            "sort_order": "",
+            "limit": 100,
+            "page": 1,
+        },
+    )
+    assert response.status_code == 200
+
+    data = response.json()
+    assert isinstance(data, list)
+    assert len(data) == 2
+
+
+def test_get_activities___success_with_search_term_filter(client):
+    response = client.get(
+        "/activities",
+        params={
+            "search_term": "Description for Festival 1",
+            "sort_field": "",
+            "sort_order": "",
+            "limit": 100,
+            "page": 1,
+        },
+    )
+    assert response.status_code == 200
+
+    data = response.json()
+    assert isinstance(data, list)
+    assert len(data) == 1
+    assert data[0]["description"] == "Description for Festival 1"
+
+
+def test_get_activities___success_with_sorting(client):
+    response = client.get(
+        "/activities",
+        params={
+            "search_term": "",
+            "sort_field": "created_at",
+            "sort_order": "desc",
+            "limit": 100,
+            "page": 1,
+        },
+    )
+    assert response.status_code == 200
+
+    data = response.json()
+    assert isinstance(data, list)
+    assert len(data) == 2
+    assert data[0]["id"] == 2
