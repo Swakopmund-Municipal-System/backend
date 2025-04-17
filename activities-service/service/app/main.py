@@ -6,6 +6,11 @@ from sqlalchemy.orm import Session
 from app.database import Base, get_engine
 from app.routes import activity_image_routes, activity_routes
 
+import os
+
+if not os.path.exists("uploads"):
+    os.makedirs("uploads")
+
 Base.metadata.create_all(bind=get_engine())
 
 app = FastAPI(
