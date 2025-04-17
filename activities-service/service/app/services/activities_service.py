@@ -1,6 +1,6 @@
 import uuid
-from pytest import Session
 
+from sqlalchemy.orm import Session
 from app.models.db.models import Activity, ActivityImage, Image
 from app.models.dto.models import (
     ActivityCreateDTO,
@@ -138,6 +138,10 @@ def create_activity(db: Session, data: ActivityCreateDTO) -> tuple[int, int, str
             )
             db.add(activity_image_data)
             db.flush()
+
+            fileSavePath = f"uploads/{image_data.filepath}"
+            with open(fileSavePath, "wb") as f:
+                f.write(image.file.read())
 
         db.commit()
 

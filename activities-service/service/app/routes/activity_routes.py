@@ -3,7 +3,7 @@ from typing import List, Optional
 
 from fastapi.responses import JSONResponse
 from pydantic import ValidationError
-from pytest import Session
+from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.models.dto.models import ActivityCreateDTO, ActivityEditDTO

@@ -17,4 +17,4 @@ app = FastAPI(
 
 
 app.include_router(activity_routes.router, prefix="/activities", tags=[])
-app.include_router(activity_image_routes.router, prefix="/activities/images", tags=[])
+app.include_router(activity_image_routes.router, prefix="/images", tags=[])
