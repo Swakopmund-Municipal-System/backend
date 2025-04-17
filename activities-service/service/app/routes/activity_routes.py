@@ -9,6 +9,7 @@ from app.database import get_db
 from app.models.dto.models import ActivityCreateDTO, ActivityEditDTO
 from app.services.activities_service import (
     create_activity,
+    delete_activity_by_id,
     edit_activity,
     search_activities,
 )
@@ -105,4 +106,26 @@ async def update_activity(
     return JSONResponse(
         status_code=200,
         content={"message": "Activity updated successfully."},
+    )
+
+
+@router.delete(
+    "/{activity_id}",
+    responses={
+        200: {"description": "Activity deleted successfully."},
+        404: {"description": "Activity not found."},
+        500: {"description": "Internal server error."},
+    },
+)
+async def delete_activity(
+    activity_id: int,
+    db: Session = Depends(get_db),
+):
+    (success, status_code, err_message) = delete_activity_by_id(db, activity_id)
+    if status_code != 200:
+        raise HTTPException(status_code=status_code, detail=err_message)
+
+    return JSONResponse(
+        status_code=200,
+        content={"message": "Activity deleted successfully."},
     )

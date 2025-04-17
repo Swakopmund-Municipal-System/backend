@@ -139,3 +139,19 @@ def edit_activity(db: Session, data: ActivityEditDTO) -> tuple[bool, int, str]:
         db.rollback()
         print(f"Error updating activity: {e}")
         return False, 500, str(e)
+
+
+def delete_activity_by_id(db: Session, activity_id: int) -> tuple[bool, int, str]:
+    try:
+        activity_data = db.query(Activity).filter(Activity.id == activity_id).first()
+        if not activity_data:
+            return False, 404, "Activity not found"
+
+        db.delete(activity_data)
+        db.commit()
+
+        return True, 200, "Activity deleted successfully"
+    except Exception as e:
+        db.rollback()
+        print(f"Error deleting activity: {e}")
+        return False, 500, str(e)
