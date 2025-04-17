@@ -1,3 +1,4 @@
+import os
 import uuid
 from fastapi import UploadFile
 from sqlalchemy.orm import Session
@@ -92,4 +93,23 @@ def get_image_ids_for_activity(
         )
     except Exception as e:
         print(f"Failed to retrieve images: {e}")
+        return None, 500, str(e)
+
+
+def delete_image_by_id(db: Session, image_id: int) -> tuple[bool, int, str]:
+    try:
+        image = db.query(Image).filter(Image.id == image_id).first()
+        if not image:
+            return None, 404, "Image not found"
+
+        db.delete(image)
+        db.commit()
+
+        if os.path.exists(f"uploads/{image.filepath}"):
+            os.remove(f"uploads/{image.filepath}")
+
+        return True, 200, "Image deleted successfully"
+    except Exception as e:
+        db.rollback()
+        print(f"Failed to delete image: {e}")
         return None, 500, str(e)

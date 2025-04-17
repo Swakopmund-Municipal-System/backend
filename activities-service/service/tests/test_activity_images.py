@@ -132,3 +132,27 @@ def test_get_activity_image___success(client):
     assert file_retrieval_response.status_code == 200
     assert file_retrieval_response.headers["Content-Type"] == "image/jpeg"
     assert len(file_retrieval_response.content) > 0
+
+
+def test_delete_activity_image___success(client):
+    file = ("images", ("test1.jpg", load_test_file("swk_1.jpg"), "image/jpeg"))
+    response = client.post(
+        "/images/activity/1/upload",
+        files=[file],
+    )
+    assert response.status_code == 201
+
+    activity_image_ids = client.get("/images/activity/1")
+    assert activity_image_ids.status_code == 200
+    data = activity_image_ids.json()
+    image_ids = data.get("image_ids", [])
+    assert isinstance(image_ids, list)
+    assert len(image_ids) == 3
+
+    delete_response = client.delete(f"/images/{image_ids[2]}")
+    assert delete_response.status_code == 200
+
+
+def test_delete_activity_image___invalid_image_id(client):
+    response = client.delete("/images/9999")
+    assert response.status_code == 404

@@ -7,6 +7,7 @@ from app.database import get_db
 from app.models.db.models import Image
 from app.services.activity_images_service import (
     add_images_for_activity,
+    delete_image_by_id,
     get_image_ids_for_activity,
     set_hero_image_for_activity,
 )
@@ -121,4 +122,26 @@ def get_activity_images(
     return JSONResponse(
         status_code=200,
         content={"image_ids": image_ids},
+    )
+
+
+@router.delete(
+    "/{activity_id}",
+    responses={
+        200: {"description": "image deleted successfully."},
+        404: {"description": "activity not found."},
+        500: {"description": "Internal server error."},
+    },
+)
+def delete_activity_images(
+    activity_id: int,
+    db: Session = Depends(get_db),
+):
+    (success, status_code, err_message) = delete_image_by_id(db, activity_id)
+    if not success:
+        raise HTTPException(status_code=status_code, detail=err_message)
+
+    return JSONResponse(
+        status_code=200,
+        content={"message": "Image deleted successfully."},
     )
