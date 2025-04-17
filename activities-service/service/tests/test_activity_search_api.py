@@ -1,3 +1,4 @@
+import json
 import pytest
 from fastapi.testclient import TestClient
 
@@ -56,3 +57,23 @@ def test_get_activities___success_with_sorting(client):
     assert isinstance(data, list)
     assert len(data) == 2
     assert data[0]["id"] == 2
+
+
+def test_get_actitity_by_id___success(client):
+    response = client.get("/activities/1")
+    assert response.status_code == 200
+    raw_data = response.json()
+    data = json.loads(raw_data)
+
+    assert data["id"] == 1
+    assert data["name"] == "Festival 1"
+
+
+def test_get_activity_by_id___not_found(client):
+    response = client.get("/activities/9999")
+    assert response.status_code == 404
+
+
+def test_get_activity_by_id___invalid_id(client):
+    response = client.get("/activities/invalid_id")
+    assert response.status_code == 422

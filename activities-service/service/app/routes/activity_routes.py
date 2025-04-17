@@ -11,6 +11,7 @@ from app.services.activities_service import (
     create_activity,
     delete_activity_by_id,
     edit_activity,
+    get_activity_by_id,
     search_activities,
 )
 
@@ -128,4 +129,26 @@ async def delete_activity(
     return JSONResponse(
         status_code=200,
         content={"message": "Activity deleted successfully."},
+    )
+
+
+@router.get(
+    "/{activity_id}",
+    responses={
+        200: {"description": "Activity retrieved successfully."},
+        404: {"description": "Activity not found."},
+        500: {"description": "Internal server error."},
+    },
+)
+async def get_activity(
+    activity_id: int,
+    db: Session = Depends(get_db),
+):
+    (activity_data, status_code, err_message) = get_activity_by_id(db, activity_id)
+    if status_code != 200:
+        raise HTTPException(status_code=status_code, detail=err_message)
+
+    return JSONResponse(
+        status_code=200,
+        content=activity_data.model_dump_json(),
     )

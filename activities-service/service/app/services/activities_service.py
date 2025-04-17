@@ -4,6 +4,7 @@ from pytest import Session
 from app.models.db.models import Activity, ActivityImage, Image
 from app.models.dto.models import (
     ActivityCreateDTO,
+    ActivityDetailDTO,
     ActivityEditDTO,
     ActivitySearchResultDTO,
 )
@@ -63,6 +64,34 @@ def search_activities(
     except Exception as e:
         print(f"Error searching activities: {e}")
         return []
+
+
+def get_activity_by_id(
+    db: Session, activity_id: int
+) -> tuple[ActivityDetailDTO, int, str]:
+    try:
+        activity_data = db.query(Activity).filter(Activity.id == activity_id).first()
+        if not activity_data:
+            return None, 404, "Activity not found"
+
+        return_data = ActivityDetailDTO(
+            id=activity_data.id,
+            name=activity_data.name,
+            description=activity_data.description,
+            address=activity_data.address,
+            type=activity_data.type,
+            createdAt=activity_data.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+            updatedAt=activity_data.updated_at.strftime("%Y-%m-%d %H:%M:%S"),
+            latitude=activity_data.latitude,
+            longitude=activity_data.longitude,
+            booking_url=activity_data.booking_url,
+            hero_image_id=activity_data.hero_image_id,
+        )
+
+        return return_data, 200, "Activity retrieved successfully"
+    except Exception as e:
+        print(f"Error retrieving activity: {e}")
+        return None, 500, str(e)
 
 
 def create_activity(db: Session, data: ActivityCreateDTO) -> tuple[int, int, str]:

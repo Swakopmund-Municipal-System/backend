@@ -38,3 +38,8 @@ class ActivitySearchResultDTO(BaseModel):
 
 class ActivityEditDTO(ActivityBase):
     id: int = Field(..., example=1)
+
+
+class ActivityDetailDTO(ActivityBase):
+    id: int = Field(..., example=1)
+    hero_image_id: Optional[int] = Field(..., example=1)
