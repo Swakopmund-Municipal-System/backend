@@ -1,12 +1,16 @@
 import json
+import os
 import pytest
 from fastapi.testclient import TestClient
 
-from tests.test_activity_creation_api import load_test_file
+
+def load_test_file(filename):
+    filepath = os.path.join("tests", "test_upload_files", filename)
+    return open(filepath, "rb")
 
 
 def test_upload_hero_image___success(client):
-    hero = ("hero_image", ("hero.jpg", load_test_file("swk_1.jpg"), "image/jpeg"))
+    hero = ("image", ("hero.jpg", load_test_file("swk_1.jpg"), "image/jpeg"))
 
     response = client.post(
         "/images/activity/1/hero/upload",
@@ -16,7 +20,7 @@ def test_upload_hero_image___success(client):
 
 
 def test_upload_hero_image___invalid_activity_id(client):
-    hero = ("hero_image", ("hero.jpg", load_test_file("swk_1.jpg"), "image/jpeg"))
+    hero = ("image", ("hero.jpg", load_test_file("swk_1.jpg"), "image/jpeg"))
 
     response = client.post(
         "/images/activity/9999/hero/upload",
@@ -34,7 +38,7 @@ def test_upload_hero_image___missing_file(client):
 
 def test_upload_hero_image___invalid_file_type(client):
     invalid_file = (
-        "hero_image",
+        "image",
         ("hero.txt", load_test_file("swk_1.jpg"), "text/plain"),
     )
 
@@ -47,8 +51,8 @@ def test_upload_hero_image___invalid_file_type(client):
 
 def test_upload_activity_images___success(client):
     files = [
-        ("files", ("test1.jpg", load_test_file("swk_1.jpg"), "image/jpeg")),
-        ("files", ("test2.jpg", load_test_file("swk_1.jpg"), "image/jpeg")),
+        ("images", ("test1.jpg", load_test_file("swk_1.jpg"), "image/jpeg")),
+        ("images", ("test2.jpg", load_test_file("swk_1.jpg"), "image/jpeg")),
     ]
 
     response = client.post(
@@ -60,8 +64,8 @@ def test_upload_activity_images___success(client):
 
 def test_upload_activity_images___invalid_activity_id(client):
     files = [
-        ("files", ("test1.jpg", load_test_file("swk_1.jpg"), "image/jpeg")),
-        ("files", ("test2.jpg", load_test_file("swk_1.jpg"), "image/jpeg")),
+        ("images", ("test1.jpg", load_test_file("swk_1.jpg"), "image/jpeg")),
+        ("images", ("test2.jpg", load_test_file("swk_1.jpg"), "image/jpeg")),
     ]
 
     response = client.post(
@@ -79,7 +83,7 @@ def test_upload_activity_images___missing_files(client):
 
 
 def test_upload_activity_images___invalid_file_type(client):
-    invalid_file = ("files", ("test.txt", load_test_file("swk_1.jpg"), "text/plain"))
+    invalid_file = ("images", ("test.txt", load_test_file("swk_1.jpg"), "text/plain"))
 
     response = client.post(
         "/images/activity/1/upload",
@@ -89,40 +93,42 @@ def test_upload_activity_images___invalid_file_type(client):
 
 
 def test_get_activity_image_ids___success(client):
-    file = ("test1.jpg", load_test_file("swk_1.jpg"), "image/jpeg")
+    file = ("images", ("test1.jpg", load_test_file("swk_1.jpg"), "image/jpeg"))
     response = client.post(
         "/images/activity/1/upload",
         files=[file],
     )
     assert response.status_code == 201
 
-    response = client.get("/images/activity/1/images")
+    response = client.get("/images/activity/1")
     assert response.status_code == 200
     data = response.json()
-    assert isinstance(data, list)
-    assert len(data) == 1
+    image_ids = data.get("image_ids", [])
+    assert isinstance(image_ids, list)
+    assert len(image_ids) == 3
 
 
 def test_get_activity_image_ids___invalid_activity_id(client):
-    response = client.get("/images/activity/9999/images")
+    response = client.get("/images/activity/9999")
     assert response.status_code == 404
 
 
 def test_get_activity_image___success(client):
-    file = ("test1.jpg", load_test_file("swk_1.jpg"), "image/jpeg")
+    file = ("images", ("test1.jpg", load_test_file("swk_1.jpg"), "image/jpeg"))
     response = client.post(
         "/images/activity/1/upload",
         files=[file],
     )
     assert response.status_code == 201
 
-    activity_image_ids = client.get("/images/1/images")
+    activity_image_ids = client.get("/images/activity/1")
     assert activity_image_ids.status_code == 200
     data = activity_image_ids.json()
-    assert isinstance(data, list)
-    assert len(data) == 1
+    image_ids = data.get("image_ids", [])
+    assert isinstance(image_ids, list)
+    assert len(image_ids) == 3
 
-    file_retrieval_response = client.get(f"/images/{data[0]}")
+    file_retrieval_response = client.get(f"/images/{image_ids[2]}")
     assert file_retrieval_response.status_code == 200
     assert file_retrieval_response.headers["Content-Type"] == "image/jpeg"
     assert len(file_retrieval_response.content) > 0

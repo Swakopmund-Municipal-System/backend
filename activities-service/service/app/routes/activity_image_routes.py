@@ -11,6 +11,8 @@ from app.services.activity_images_service import (
     set_hero_image_for_activity,
 )
 
+ALLOWED_MIME_TYPES = ["image/png", "image/jpeg"]
+
 router = APIRouter()
 
 
@@ -26,20 +28,15 @@ def get_image(
     image_id: int,
     db: Session = Depends(get_db),
 ):
-    try:
-        image_data = db.query(Image).filter(Image.id == image_id).first()
-        if not image_data:
-            raise HTTPException(status_code=404, detail="Image not found")
+    image_data = db.query(Image).filter(Image.id == image_id).first()
+    if not image_data:
+        raise HTTPException(status_code=404, detail="Image not found")
 
-        file_path = f"uploads/{image_data.filepath}"
-        if not os.path.exists(file_path):
-            raise HTTPException(status_code=404, detail="File not found")
+    file_path = f"uploads/{image_data.filepath}"
+    if not os.path.exists(file_path):
+        raise HTTPException(status_code=404, detail="File not found")
 
-        return FileResponse(file_path)
-
-    except Exception as e:
-        print(f"Error retrieving image: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+    return FileResponse(file_path)
 
 
 @router.post(
@@ -55,21 +52,22 @@ def upload_hero_image(
     image: UploadFile = File(...),
     db: Session = Depends(get_db),
 ):
-    try:
-        (success, status_code, err_message) = set_hero_image_for_activity(
-            db, activity_id, image
-        )
-        if not success:
-            raise HTTPException(status_code=status_code, detail=err_message)
-
-        return JSONResponse(
-            status_code=status_code,
-            content={"message": "Image uploaded successfully."},
+    if image.content_type not in ALLOWED_MIME_TYPES:
+        raise HTTPException(
+            status_code=422,
+            detail="Invalid file type. Only PNG and JPEG images are allowed.",
         )
 
-    except Exception as e:
-        print(f"Error uploading image: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+    (success, status_code, err_message) = set_hero_image_for_activity(
+        db, activity_id, image
+    )
+    if not success:
+        raise HTTPException(status_code=status_code, detail=err_message)
+
+    return JSONResponse(
+        status_code=status_code,
+        content={"message": "Image uploaded successfully."},
+    )
 
 
 @router.post(
@@ -85,21 +83,23 @@ def upload_activity_images(
     images: list[UploadFile] = File(...),
     db: Session = Depends(get_db),
 ):
-    try:
-        (success, status_code, err_message) = add_images_for_activity(
-            db, activity_id, images
-        )
-        if not success:
-            raise HTTPException(status_code=status_code, detail=err_message)
+    for image in images:
+        if image.content_type not in ALLOWED_MIME_TYPES:
+            raise HTTPException(
+                status_code=422,
+                detail="Invalid file type. Only PNG and JPEG images are allowed.",
+            )
 
-        return JSONResponse(
-            status_code=201,
-            content={"message": "Images uploaded successfully."},
-        )
+    (success, status_code, err_message) = add_images_for_activity(
+        db, activity_id, images
+    )
+    if not success:
+        raise HTTPException(status_code=status_code, detail=err_message)
 
-    except Exception as e:
-        print(f"Error uploading images: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+    return JSONResponse(
+        status_code=201,
+        content={"message": "Images uploaded successfully."},
+    )
 
 
 @router.get(
@@ -114,18 +114,11 @@ def get_activity_images(
     activity_id: int,
     db: Session = Depends(get_db),
 ):
-    try:
-        (image_ids, status_code, err_message) = get_image_ids_for_activity(
-            db, activity_id
-        )
-        if not image_ids:
-            raise HTTPException(status_code=status_code, detail=err_message)
+    (image_ids, status_code, err_message) = get_image_ids_for_activity(db, activity_id)
+    if not image_ids:
+        raise HTTPException(status_code=status_code, detail=err_message)
 
-        return JSONResponse(
-            status_code=200,
-            content={"image_ids": image_ids},
-        )
-
-    except Exception as e:
-        print(f"Error retrieving images: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+    return JSONResponse(
+        status_code=200,
+        content={"image_ids": image_ids},
+    )
