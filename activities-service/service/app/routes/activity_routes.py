@@ -6,8 +6,12 @@ from pydantic import ValidationError
 from pytest import Session
 
 from app.database import get_db
-from app.models.dto.models import ActivityCreateDTO
-from app.services.activities_service import create_activity, search_activities
+from app.models.dto.models import ActivityCreateDTO, ActivityEditDTO
+from app.services.activities_service import (
+    create_activity,
+    edit_activity,
+    search_activities,
+)
 
 router = APIRouter()
 
@@ -79,3 +83,26 @@ async def get_activities(
         return search_activities(db, search_term, sort_field, sort_order, limit, page)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post(
+    "/edit",
+    responses={
+        200: {"description": "Activity edited successfully."},
+        400: {"description": "Invalid input data."},
+        404: {"description": "Activity not found."},
+        500: {"description": "Internal server error."},
+    },
+)
+async def update_activity(
+    data: ActivityEditDTO,
+    db: Session = Depends(get_db),
+):
+    (success, status_code, err_message) = edit_activity(db, data)
+    if status_code != 200:
+        raise HTTPException(status_code=status_code, detail=err_message)
+
+    return JSONResponse(
+        status_code=200,
+        content={"message": "Activity updated successfully."},
+    )

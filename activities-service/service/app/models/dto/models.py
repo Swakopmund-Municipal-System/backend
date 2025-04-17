@@ -34,3 +34,7 @@ class ActivitySearchResultDTO(BaseModel):
     longitude: float = Field(..., example=12.345678)
     image_id: int = Field(..., example=1)
     booking_url: str = Field(..., example="https://example.com/booking/go-carting")
+
+
+class ActivityEditDTO(ActivityBase):
+    id: int = Field(..., example=1)

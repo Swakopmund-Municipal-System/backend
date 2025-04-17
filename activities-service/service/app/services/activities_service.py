@@ -2,7 +2,11 @@ import uuid
 from pytest import Session
 
 from app.models.db.models import Activity, ActivityImage, Image
-from app.models.dto.models import ActivityCreateDTO, ActivitySearchResultDTO
+from app.models.dto.models import (
+    ActivityCreateDTO,
+    ActivityEditDTO,
+    ActivitySearchResultDTO,
+)
 
 
 def search_activities(
@@ -113,3 +117,25 @@ def create_activity(db: Session, data: ActivityCreateDTO) -> tuple[int, int, str
         db.rollback()
         print(f"Error creating activity: {e}")
         return None, 500, str(e)
+
+
+def edit_activity(db: Session, data: ActivityEditDTO) -> tuple[bool, int, str]:
+    try:
+        activity_data = db.query(Activity).filter(Activity.id == data.id).first()
+        if not activity_data:
+            return False, 404, "Activity not found"
+
+        activity_data.name = data.name
+        activity_data.description = data.description
+        activity_data.address = data.address
+        activity_data.booking_url = data.booking_url
+        activity_data.latitude = data.latitude
+        activity_data.longitude = data.longitude
+
+        db.commit()
+
+        return True, 200, "Activity updated successfully"
+    except Exception as e:
+        db.rollback()
+        print(f"Error updating activity: {e}")
+        return False, 500, str(e)
