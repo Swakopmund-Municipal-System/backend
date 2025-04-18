@@ -1,0 +1,100 @@
+name: CI - Dynamic Microservice Builds
+
+on:
+  pull_request:
+    branches: [ dev ]
+    types: [closed]
+
+jobs:
+
+  discover-services:
+    name: Discover Microservices
+    if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'dev'
+    runs-on: ubuntu-latest
+    outputs:
+      services: ${{ steps.set-matrix.outputs.services }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Discover service folders
+        id: set-matrix
+        run: |
+          echo "Finding services in ./services directory..."
+          folders=$(find services -mindepth 1 -maxdepth 1 -type d -exec basename {} \;)
+          echo "Found: $folders"
+
+          # Convert newline-separated list to JSON array
+          json_array=$(echo "$folders" | jq -R . | jq -s .)
+          echo "services=$json_array" >> $GITHUB_OUTPUT
+
+  build:
+    name: Build & Test - ${{ matrix.service }}
+    needs: discover-services
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        service: ${{ fromJson(needs.discover-services.outputs.services) }}
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Copy .env if exists
+        run: |
+          SERVICE_DIR=services/${{ matrix.service }}
+          if [ -f "$SERVICE_DIR/.env" ]; then
+            echo ".env found, copying for CI build"
+            cp "$SERVICE_DIR/.env" "$SERVICE_DIR/.env.ci"
+          fi
+
+      - name: Build Service
+        run: |
+          SERVICE=${{ matrix.service }}
+          SERVICE_DIR=services/$SERVICE
+          echo "Building $SERVICE"
+
+          if [ -f "$SERVICE_DIR/docker-compose.yml" ]; then
+            echo "Using docker-compose"
+            docker-compose -f "$SERVICE_DIR/docker-compose.yml" --env-file "$SERVICE_DIR/.env.ci" build
+          elif [ -f "$SERVICE_DIR/Dockerfile" ]; then
+            echo "Using docker build"
+            docker build -t $SERVICE:latest "$SERVICE_DIR"
+          else
+            echo "No Dockerfile or docker-compose.yml found for $SERVICE"
+            exit 1
+          fi
+
+      - name: Run Tests (if exists)
+        run: |
+          SERVICE_DIR=services/${{ matrix.service }}
+
+          if [ -f "$SERVICE_DIR/run_tests.sh" ]; then
+            echo "Running custom test script for $SERVICE_DIR"
+            chmod +x "$SERVICE_DIR/run_tests.sh"
+            "$SERVICE_DIR/run_tests.sh"
+          elif [ -d "$SERVICE_DIR/tests" ]; then
+            echo "Found 'tests' directory. Attempting to run pytest..."
+            pip install pytest
+            pytest "$SERVICE_DIR/tests"
+          else
+            echo "No test suite found for $SERVICE_DIR, skipping tests."
+          fi
+
+      - name: Notify on Success (Discord)
+        if: success()
+        run: |
+          curl -X POST ${{ secrets.DISCORD_WEBHOOK_URL }} \
+            -H "Content-Type: application/json" \
+            -d "{\"content\": \"CI Success: ${{ matrix.service }} built & tested successfully!\"}"
+
+      - name: Notify on Failure (Discord)
+        if: failure()
+        run: |
+          curl -X POST ${{ secrets.DISCORD_WEBHOOK_URL }} \
+            -H "Content-Type: application/json" \
+            -d "{\"content\": \"CI Failed: ${{ matrix.service }} failed during build or test.\"}"
