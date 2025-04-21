@@ -79,10 +79,13 @@ async def get_activities(
     sort_order: str = "desc",
     limit: int = 10,
     page: int = 1,
+    categories: Optional[str] = None,
     db: Session = Depends(get_db),
 ):
     try:
-        return search_activities(db, search_term, sort_field, sort_order, limit, page)
+        return search_activities(
+            db, search_term, sort_field, sort_order, limit, page, categories
+        )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

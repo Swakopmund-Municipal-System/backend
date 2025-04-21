@@ -1,3 +1,4 @@
+from typing import List, Optional
 import uuid
 
 from sqlalchemy.orm import Session
@@ -17,6 +18,7 @@ def search_activities(
     sort_order: str = "asc",
     limit: int = 10,
     page: int = 1,
+    categories: Optional[str] = None,
 ) -> list[ActivitySearchResultDTO]:
     try:
         if sort_order not in ["asc", "desc"]:
@@ -34,6 +36,10 @@ def search_activities(
             (Activity.name.ilike(f"%{search_term}%"))
             | (Activity.description.ilike(f"%{search_term}%"))
         )
+
+        if categories and len(categories) > 0:
+            category_list = categories.split(",")
+            query = query.filter(Activity.type.in_(category_list))
 
         if len(sort_field) > 0:
             if sort_order == "asc":
