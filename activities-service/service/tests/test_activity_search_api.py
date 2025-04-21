@@ -7,7 +7,7 @@ from app.models.enums.enums import ActivityType
 
 def test_get_activities___success_no_filters(client):
     response = client.get(
-        "/activities",
+        "/activities/search",
         params={
             "search_term": "",
             "sort_field": "",
@@ -25,7 +25,7 @@ def test_get_activities___success_no_filters(client):
 
 def test_get_activities___success_with_search_term_filter(client):
     response = client.get(
-        "/activities",
+        "/activities/search",
         params={
             "search_term": "Description for Festival 1",
             "sort_field": "",
@@ -44,7 +44,7 @@ def test_get_activities___success_with_search_term_filter(client):
 
 def test_get_activities___success_with_sorting(client):
     response = client.get(
-        "/activities",
+        "/activities/search",
         params={
             "search_term": "",
             "sort_field": "created_at",
@@ -63,7 +63,7 @@ def test_get_activities___success_with_sorting(client):
 
 def test_get_activities___success_category_festival(client):
     response = client.get(
-        "/activities",
+        "/activities/search",
         params={
             "search_term": "",
             "sort_field": "",
@@ -83,7 +83,7 @@ def test_get_activities___success_category_festival(client):
 
 def test_get_activities___success_category_recreational_and_festival(client):
     response = client.get(
-        "/activities",
+        "/activities/search",
         params={
             "search_term": "",
             "sort_field": "",
@@ -106,7 +106,7 @@ def test_get_activities___success_category_recreational_and_festival(client):
 
 def test_get_activities___success_no_item_with_category(client):
     response = client.get(
-        "/activities",
+        "/activities/search",
         params={
             "search_term": "",
             "sort_field": "",
@@ -114,6 +114,99 @@ def test_get_activities___success_no_item_with_category(client):
             "limit": 100,
             "page": 1,
             "categories": f"99999",
+        },
+    )
+    assert response.status_code == 200
+
+    data = response.json()
+    assert isinstance(data, list)
+    assert len(data) == 0
+
+
+def test_get_activities_by_location___success(client):
+    response = client.get(
+        "/activities/search/location",
+        params={
+            "latitude": -22.592063343286743,
+            "longitude": 17.080047073592386,
+            "radius": 1000,
+            "search_term": "",
+            "categories": None,
+        },
+    )
+    assert response.status_code == 200
+
+    data = response.json()
+    assert isinstance(data, list)
+    assert len(data) == 1
+    assert data[0]["id"] == 1
+
+
+def test_get_activities_by_location___success_with_search_term(client):
+    response = client.get(
+        "/activities/search/location",
+        params={
+            "latitude": -22.592063343286743,
+            "longitude": 17.080047073592386,
+            "radius": 1000,
+            "search_term": "Festival 1",
+            "categories": None,
+        },
+    )
+    assert response.status_code == 200
+
+    data = response.json()
+    assert isinstance(data, list)
+    assert len(data) == 1
+    assert data[0]["id"] == 1
+
+
+def test_get_activities_by_location___success_with_category(client):
+    response = client.get(
+        "/activities/search/location",
+        params={
+            "latitude": -22.592063343286743,
+            "longitude": 17.080047073592386,
+            "radius": 1000,
+            "search_term": "",
+            "categories": f"{ActivityType.FESTIVAL}",
+        },
+    )
+    assert response.status_code == 200
+
+    data = response.json()
+    assert isinstance(data, list)
+    assert len(data) == 1
+    assert data[0]["type"] == ActivityType.FESTIVAL.value
+
+
+def test_get_activities_by_location___success_larger_radius(client):
+    response = client.get(
+        "/activities/search/location",
+        params={
+            "latitude": -22.592063343286743,
+            "longitude": 17.080047073592386,
+            "radius": 10000,
+            "search_term": "",
+            "categories": None,
+        },
+    )
+    assert response.status_code == 200
+
+    data = response.json()
+    assert isinstance(data, list)
+    assert len(data) == 2
+
+
+def test_get_activities_by_location___success_no_items(client):
+    response = client.get(
+        "/activities/search/location",
+        params={
+            "latitude": -21.592063343286743,
+            "longitude": 17.080047073592386,
+            "radius": 1000,
+            "search_term": "",
+            "categories": None,
         },
     )
     assert response.status_code == 200

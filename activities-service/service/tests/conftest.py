@@ -82,8 +82,9 @@ def test_db():
                 updated_by=uuid.uuid4(),
                 booking_url="http://example.com/booking",
                 hero_image_id=1,
-                latitude=12.34,
-                longitude=56.78,
+                latitude=-22.592063343286743,
+                longitude=17.080047073592386,
+                point_geom="SRID=4326;POINT(17.080047073592386 -22.592063343286743)",
             ),
             Activity(
                 id=2,
@@ -97,8 +98,9 @@ def test_db():
                 updated_by=uuid.uuid4(),
                 booking_url="http://example.com/booking",
                 hero_image_id=2,
-                latitude=12.34,
-                longitude=56.78,
+                latitude=-22.54742520993337,
+                longitude=17.076575094549124,
+                point_geom="SRID=4326;POINT(17.076575094549124 -22.54742520993337)",
             ),
         ]
         session.add_all(activities)

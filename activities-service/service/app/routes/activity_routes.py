@@ -13,6 +13,7 @@ from app.services.activities_service import (
     edit_activity,
     get_activity_by_id,
     search_activities,
+    search_activities_by_location,
 )
 
 router = APIRouter()
@@ -66,7 +67,7 @@ async def create_new_activity(
 
 
 @router.get(
-    "/",
+    "/search",
     responses={
         201: {"description": "Activity created successfully."},
         400: {"description": "Invalid input data."},
@@ -85,6 +86,30 @@ async def get_activities(
     try:
         return search_activities(
             db, search_term, sort_field, sort_order, limit, page, categories
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get(
+    "/search/location",
+    responses={
+        201: {"description": "search successful."},
+        400: {"description": "Invalid input data."},
+        500: {"description": "Internal server error."},
+    },
+)
+async def get_activities_by_location(
+    latitude: float,
+    longitude: float,
+    radius: int = 1000,
+    search_term: str = "",
+    categories: Optional[str] = None,
+    db: Session = Depends(get_db),
+):
+    try:
+        return search_activities_by_location(
+            db, latitude, longitude, radius, search_term, categories
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

@@ -1,6 +1,7 @@
 from typing import List, Optional
 import uuid
 
+from sqlalchemy import text
 from sqlalchemy.orm import Session
 from app.models.db.models import Activity, ActivityImage, Image
 from app.models.dto.models import (
@@ -69,6 +70,55 @@ def search_activities(
         return return_data
     except Exception as e:
         print(f"Error searching activities: {e}")
+        return []
+
+
+def search_activities_by_location(
+    db: Session,
+    latitude: float,
+    longitude: float,
+    radius: int = 1000,
+    search_term: str = "",
+    categories: Optional[str] = None,
+) -> list[ActivitySearchResultDTO]:
+    try:
+        query = db.query(Activity).filter(
+            (Activity.name.ilike(f"%{search_term}%"))
+            | (Activity.description.ilike(f"%{search_term}%"))
+        )
+
+        if categories and len(categories) > 0:
+            category_list = categories.split(",")
+            query = query.filter(Activity.type.in_(category_list))
+
+        query = query.filter(
+            text(
+                f"ST_DWithin(point_geom, ST_MakePoint({longitude}, {latitude})::geography, {radius})"
+            )
+        )
+
+        data = query.all()
+
+        return_data = [
+            ActivitySearchResultDTO(
+                id=item.id,
+                name=item.name,
+                description=item.description,
+                booking_url=item.booking_url,
+                type=item.type,
+                image_id=item.hero_image_id,
+                latitude=item.latitude,
+                longitude=item.longitude,
+                createdAt=item.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+                updatedAt=item.updated_at.strftime("%Y-%m-%d %H:%M:%S"),
+                address=item.address,
+            )
+            for item in data
+        ]
+
+        return return_data
+    except Exception as e:
+        print(f"Error searching activities by location: {e}")
         return []
 
 
