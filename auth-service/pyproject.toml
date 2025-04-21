@@ -1,0 +1,30 @@
+[project]
+name = "authservice"
+version = "0.1.0"
+description = "Authentication service for Swakopmund"
+authors = [
+    {name = "Sakaria Nghivafe",email = "sakarianghivafe@gmail.com"}
+]
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "djangorestframework (>=3.16.0,<4.0.0)",
+    "django (>=5.2,<6.0)",
+    "django-rest-knox (>=5.0.2,<6.0.0)",
+    "daphne (>=4.1.2,<5.0.0)",
+    "django-cors-headers (>=4.7.0,<5.0.0)",
+    "celery (>=5.5.1,<6.0.0)",
+    "django-filter (>=25.1,<26.0)",
+    "httpx (>=0.28.1,<0.29.0)",
+    "psycopg2-binary (>=2.9.10,<3.0.0)",
+    "python-dotenv (>=1.1.0,<2.0.0)"
+]
+
+[tool.poetry]
+
+[tool.poetry.scripts]
+serve = "scripts.dev:main"
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
