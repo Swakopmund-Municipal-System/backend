@@ -70,14 +70,12 @@ jobs:
             exit 1
           fi
 
-
-
       - name: Notify on Success (Discord)
         if: success()
         run: |
           curl -X POST ${{ secrets.DISCORD_WEBHOOK_URL }} \
             -H "Content-Type: application/json" \
-            -d "{\"content\": \"CI Success: ${{ matrix.service }} built & tested successfully!\"}"
+            -d "{\"content\": \"CI Success: ${{ matrix.service }} built & tested successfully!!\"}"
 
       - name: Notify on Failure (Discord)
         if: failure()
