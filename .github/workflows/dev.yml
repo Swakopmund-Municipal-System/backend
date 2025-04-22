@@ -78,11 +78,11 @@ jobs:
         run: |
           curl -X POST ${{ secrets.DISCORD_WEBHOOK_URL }} \
             -H "Content-Type: application/json" \
-            -d "{\"content\": \"✅ CI Success: ${{ matrix.service }} built successfully!\"}"
+            -d "{\"content\": \"CI Success: ${{ matrix.service }} built successfully!\"}"
 
       - name: Notify on Failure (Discord)
         if: failure()
         run: |
           curl -X POST ${{ secrets.DISCORD_WEBHOOK_URL }} \
             -H "Content-Type: application/json" \
-            -d "{\"content\": \"❌ CI Failed: ${{ matrix.service }} failed during build.\"}"
+            -d "{\"content\": \"CI Failed: ${{ matrix.service }} failed during build.\"}"
