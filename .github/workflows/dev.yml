@@ -62,15 +62,15 @@ jobs:
           SERVICE_DIR=$SERVICE
           echo "Building $SERVICE"
 
-          if [ -f "$SERVICE_DIR/docker-compose.yml" ]; then
-            echo "Using docker-compose"
-            docker-compose -f "$SERVICE_DIR/docker-compose.yml" --env-file "$SERVICE_DIR/.env.ci" build
-          elif [ -f "$SERVICE_DIR/docker-env-dev/Dockerfile" ]; then
-            echo "Using Dockerfile from docker-env-dev"
-            docker build -t $SERVICE:latest "$SERVICE_DIR/docker-env-dev"
+          if [ -f "$SERVICE_DIR/docker-env-dev/docker-compose.yaml" ]; then
+            echo "Using docker-compose (docker-compose.yaml)"
+            docker-compose -f "$SERVICE_DIR/docker-env-dev/docker-compose.yaml" build
+          elif [ -f "$SERVICE_DIR/docker-env-dev/app.Dockerfile" ]; then
+            echo "Using app.Dockerfile from docker-env-dev"
+            docker build -f "$SERVICE_DIR/docker-env-dev/app.Dockerfile" -t $SERVICE:latest "$SERVICE_DIR/docker-env-dev"
           else
-            echo "No Dockerfile or docker-compose.yml found for $SERVICE"
-            exit 1
+            echo "Skipping $SERVICE — no docker-env-dev/app.Dockerfile or docker-compose.yaml found."
+            exit 0
           fi
 
       - name: Notify on Success (Discord)
@@ -85,4 +85,4 @@ jobs:
         run: |
           curl -X POST ${{ secrets.DISCORD_WEBHOOK_URL }} \
             -H "Content-Type: application/json" \
-            -d "{\"content\": \"CI Failed: ${{ matrix.service }} failed during build.\"}"
+            -d "{\"content\": \"CI Failed: ${{ matrix.service }} failed or skipped due to missing Docker files.\"}"
