@@ -63,8 +63,8 @@ jobs:
           echo "Building $SERVICE"
 
           if [ -f "$SERVICE_DIR/docker-env-dev/docker-compose.yaml" ]; then
-            echo "Using docker-compose (docker-compose.yaml)"
-            docker-compose -f "$SERVICE_DIR/docker-env-dev/docker-compose.yaml" build
+            echo "Using docker-compose (docker compose V2)"
+            docker compose -f "$SERVICE_DIR/docker-env-dev/docker-compose.yaml" build
           elif [ -f "$SERVICE_DIR/docker-env-dev/app.Dockerfile" ]; then
             echo "Using app.Dockerfile from docker-env-dev"
             docker build -f "$SERVICE_DIR/docker-env-dev/app.Dockerfile" -t $SERVICE:latest "$SERVICE_DIR/docker-env-dev"
@@ -73,16 +73,16 @@ jobs:
             exit 0
           fi
 
-      - name: Notify on Success (Discord)
-        if: success()
-        run: |
-          curl -X POST ${{ secrets.DISCORD_WEBHOOK_URL }} \
-            -H "Content-Type: application/json" \
-            -d "{\"content\": \"CI Success: ${{ matrix.service }} built successfully!\"}"
+      # - name: Notify on Success (Discord)
+      #   if: success()
+      #   run: |
+      #     curl -X POST ${{ secrets.DISCORD_WEBHOOK_URL }} \
+      #       -H "Content-Type: application/json" \
+      #       -d "{\"content\": \"CI Success: ${{ matrix.service }} built successfully!\"}"
 
-      - name: Notify on Failure (Discord)
-        if: failure()
-        run: |
-          curl -X POST ${{ secrets.DISCORD_WEBHOOK_URL }} \
-            -H "Content-Type: application/json" \
-            -d "{\"content\": \"CI Failed: ${{ matrix.service }} failed or skipped due to missing Docker files.\"}"
+      # - name: Notify on Failure (Discord)
+      #   if: failure()
+      #   run: |
+      #     curl -X POST ${{ secrets.DISCORD_WEBHOOK_URL }} \
+      #       -H "Content-Type: application/json" \
+      #       -d "{\"content\": \"CI Failed: ${{ matrix.service }} failed or was skipped due to missing Docker files.\"}"
