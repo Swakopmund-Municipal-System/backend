@@ -148,9 +148,10 @@ class CheckUserPermission(APIView):
         if permission_levels.index(highest_permission) >= permission_levels.index(required_permission):
             return Response({
                 'status': "authorised",
-                'user': user.email,
+                'user': {'id': user.id, 'email': user.email},
                 'permission': highest_permission,
                 'user_types': [ut.name for ut in user_types]
+                
             }, status=status.HTTP_200_OK)
         else:
             return Response({
