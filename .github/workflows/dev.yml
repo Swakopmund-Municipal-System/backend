@@ -25,9 +25,9 @@ jobs:
             \( -name '.github' -o -name '.vscode' \) -prune -o -print | sed 's|^\./||')
           echo "Found: $folders"
 
-          # Convert newline-separated list to JSON array
+         
           json_array=$(echo "$folders" | jq -R . | jq -s .)
-          echo "services=$json_array" >> $GITHUB_OUTPUT
+          echo "services=$json_array" > "$GITHUB_OUTPUT"
 
   build:
     name: Build - ${{ matrix.service }}
