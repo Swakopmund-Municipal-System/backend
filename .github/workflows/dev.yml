@@ -24,14 +24,13 @@ jobs:
           folders=$(find . -mindepth 1 -maxdepth 1 -type d \
             \( -name '.github' -o -name '.vscode' -o -name '.git' \) -prune -o -print | sed 's|^\./||')
 
-          # Remove non-service folders (optional extras)
           folders=$(echo "$folders" | grep -v -E '^(\.git|\.github|\.vscode|README.md|.dockerignore|compose.yaml)$')
 
           echo "Found folders:"
           echo "$folders"
 
-          json_array=$(printf '%s\n' $folders | jq -R . | jq -s .)
-          echo "services=${json_array}" >> "$GITHUB_OUTPUT"
+          json_array=$(printf '%s\n' $folders | jq -R . | jq -s -c .)
+          echo "services=$json_array" >> "$GITHUB_OUTPUT"
 
   build:
     name: Build - ${{ matrix.service }}
@@ -66,9 +65,9 @@ jobs:
           if [ -f "$SERVICE_DIR/docker-compose.yml" ]; then
             echo "Using docker-compose"
             docker-compose -f "$SERVICE_DIR/docker-compose.yml" --env-file "$SERVICE_DIR/.env.ci" build
-          elif [ -f "$SERVICE_DIR/Dockerfile" ]; then
-            echo "Using docker build"
-            docker build -t $SERVICE:latest "$SERVICE_DIR"
+          elif [ -f "$SERVICE_DIR/docker-env-dev/Dockerfile" ]; then
+            echo "Using Dockerfile from docker-env-dev"
+            docker build -t $SERVICE:latest "$SERVICE_DIR/docker-env-dev"
           else
             echo "No Dockerfile or docker-compose.yml found for $SERVICE"
             exit 1
@@ -79,11 +78,11 @@ jobs:
         run: |
           curl -X POST ${{ secrets.DISCORD_WEBHOOK_URL }} \
             -H "Content-Type: application/json" \
-            -d "{\"content\": \"CI Success: ${{ matrix.service }} built successfully!\"}"
+            -d "{\"content\": \"✅ CI Success: ${{ matrix.service }} built successfully!\"}"
 
       - name: Notify on Failure (Discord)
         if: failure()
         run: |
           curl -X POST ${{ secrets.DISCORD_WEBHOOK_URL }} \
             -H "Content-Type: application/json" \
-            -d "{\"content\": \"CI Failed: ${{ matrix.service }} failed during build.\"}"
+            -d "{\"content\": \"❌ CI Failed: ${{ matrix.service }} failed during build.\"}"
