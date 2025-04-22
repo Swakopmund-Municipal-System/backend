@@ -1,0 +1,38 @@
+services:
+  
+  rabbitmq:
+    image: rabbitmq:management
+    container_name: swakop-rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: password
+    networks:
+      - swakop-backend
+
+  auth_database:
+    image: postgres:latest
+    container_name: swakop-auth-db
+    ports:
+      - "8090:5432"
+    environment:
+      POSTGRES_USER: auth_user
+      POSTGRES_PASSWORD: auth_password
+      POSTGRES_DB: auth_db
+    volumes:
+      - auth_db_data:/var/lib/postgresql/data
+    networks:
+      - swakop-backend
+
+networks:
+  swakop-backend:
+    driver: bridge
+
+volumes:
+  rabbitmq_data:
+  auth_db_data:
+    
