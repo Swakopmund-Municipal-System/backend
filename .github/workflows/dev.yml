@@ -20,8 +20,9 @@ jobs:
       - name: Discover service folders
         id: set-matrix
         run: |
-          echo "Finding services in ./services directory..."
-          folders=$(find services -mindepth 1 -maxdepth 1 -type d -exec basename {} \;)
+          echo "Finding service folders in root directory...."
+          folders=$(find . -mindepth 1 -maxdepth 1 -type d \
+            \( -name '.github' -o -name '.vscode' \) -prune -o -print | sed 's|^\./||')
           echo "Found: $folders"
 
           # Convert newline-separated list to JSON array
@@ -46,7 +47,7 @@ jobs:
 
       - name: Copy .env if exists
         run: |
-          SERVICE_DIR=services/${{ matrix.service }}
+          SERVICE_DIR=${{ matrix.service }}
           if [ -f "$SERVICE_DIR/.env" ]; then
             echo ".env found, copying for CI build"
             cp "$SERVICE_DIR/.env" "$SERVICE_DIR/.env.ci"
@@ -71,7 +72,7 @@ jobs:
 
       - name: Run Tests (if exists)
         run: |
-          SERVICE_DIR=services/${{ matrix.service }}
+          SERVICE_DIR={{ matrix.service }}
 
           if [ -f "$SERVICE_DIR/run_tests.sh" ]; then
             echo "Running custom test script for $SERVICE_DIR"
