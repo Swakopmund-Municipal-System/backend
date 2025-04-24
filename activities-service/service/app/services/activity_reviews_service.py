@@ -17,6 +17,7 @@ def search_activity_reviews(
     sort_order: str = "asc",
     limit: int = 10,
     page: int = 1,
+    activity_id: int = 0,
 ) -> list[ActivityReviewSearchResultDTO]:
     try:
         if sort_order not in ["asc", "desc"]:
@@ -30,8 +31,10 @@ def search_activity_reviews(
 
         offset = (page - 1) * limit
 
-        query = db.query(ActivityReview).filter(
-            (ActivityReview.review_text.ilike(f"%{search_term}%"))
+        query = (
+            db.query(ActivityReview)
+            .filter((ActivityReview.review_text.ilike(f"%{search_term}%")))
+            .filter((ActivityReview.activity_id == activity_id))
         )
 
         if len(sort_field) > 0:
@@ -46,9 +49,10 @@ def search_activity_reviews(
             ActivityReviewSearchResultDTO(
                 id=item.id,
                 activity_id=item.activity_id,
-                user_id=item.user_id,
+                user_id=str(item.user_id),
                 review_text=item.review_text,
                 rating=item.rating,
+                created_at=item.created_at.strftime("%Y-%m-%d %H:%M:%S"),
             )
             for item in data
         ]
@@ -69,7 +73,7 @@ def create_activity_review(db: Session, data: CreateReviewDTO) -> tuple[int, int
         insert_data = ActivityReview(
             activity_id=data.activity_id,
             user_id=data.user_id,
-            review_text=data.review_text,
+            review_text=data.review,
             rating=data.rating,
             created_at=text("NOW()"),
         )

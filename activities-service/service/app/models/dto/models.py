@@ -60,3 +60,4 @@ class ActivityReviewSearchResultDTO(BaseModel):
     review_text: str = Field(
         ..., example="Great experience!", min_length=3, max_length=512
     )
+    created_at: str = Field(..., example="2023-10-01T12:00:00Z")

@@ -40,7 +40,7 @@ async def create_new_activity(
 
 
 @router.get(
-    "/search",
+    "/",
     responses={
         201: {"description": "Review created successfully."},
         400: {"description": "Invalid input data."},
@@ -53,11 +53,12 @@ async def get_activities(
     sort_order: str = "desc",
     limit: int = 10,
     page: int = 1,
+    activity_id: int = 0,
     db: Session = Depends(get_db),
 ):
     try:
         return search_activity_reviews(
-            db, search_term, sort_field, sort_order, limit, page
+            db, search_term, sort_field, sort_order, limit, page, activity_id
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

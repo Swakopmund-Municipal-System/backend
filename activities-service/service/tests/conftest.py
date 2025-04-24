@@ -12,7 +12,7 @@ from sqlalchemy.orm import sessionmaker
 
 from app.main import app
 from app.database import Base, get_db, get_engine, get_session
-from app.models.db.models import Activity, Image, ActivityImage
+from app.models.db.models import Activity, ActivityReview, Image, ActivityImage
 from app.models.enums.enums import ActivityType
 
 
@@ -118,9 +118,36 @@ def test_db():
         session.add_all(activity_images)
         session.commit()
 
+        activity_reviews = [
+            ActivityReview(
+                id=1,
+                activity_id=1,
+                user_id=uuid.uuid4(),
+                review_text="Great festival!",
+                rating=5,
+                created_at=datetime.datetime.now(),
+            ),
+            ActivityReview(
+                id=2,
+                activity_id=1,
+                user_id=uuid.uuid4(),
+                review_text="Amazing concert!",
+                rating=4,
+                created_at=datetime.datetime.now(),
+            ),
+        ]
+        session.add_all(activity_reviews)
+        session.commit()
+
         # reset the sequence for the activities table
         session.execute(
             text("SELECT setval('activities_id_seq', (SELECT MAX(id) FROM activities))")
+        )
+        # reset the sequence for the activity_reviews table
+        session.execute(
+            text(
+                "SELECT setval('activity_reviews_id_seq', (SELECT MAX(id) FROM activity_reviews))"
+            )
         )
 
         # ------ end of seeding ------

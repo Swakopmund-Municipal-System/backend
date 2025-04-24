@@ -4,7 +4,7 @@ from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 
 from app.database import Base, get_engine
-from app.routes import activity_image_routes, activity_routes
+from app.routes import activity_image_routes, activity_review_routes, activity_routes
 
 import os
 
@@ -23,3 +23,4 @@ app = FastAPI(
 
 app.include_router(activity_routes.router, prefix="/activities", tags=[])
 app.include_router(activity_image_routes.router, prefix="/images", tags=[])
+app.include_router(activity_review_routes.router, prefix="/reviews", tags=[])
