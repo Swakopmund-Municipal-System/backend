@@ -3,7 +3,7 @@ import uuid
 
 from sqlalchemy import text
 from sqlalchemy.orm import Session
-from app.models.db.models import Activity, ActivityImage, Image
+from app.models.db.models import Activity, ActivityImage, ActivityReview, Image
 from app.models.dto.models import (
     ActivityCreateDTO,
     ActivityDetailDTO,
@@ -235,6 +235,13 @@ def delete_activity_by_id(db: Session, activity_id: int) -> tuple[bool, int, str
         activity_data = db.query(Activity).filter(Activity.id == activity_id).first()
         if not activity_data:
             return False, 404, "Activity not found"
+
+        db.query(ActivityImage).filter(
+            ActivityImage.activity_id == activity_id
+        ).delete()
+        db.query(ActivityReview).filter(
+            ActivityReview.activity_id == activity_id
+        ).delete()
 
         db.delete(activity_data)
         db.commit()
