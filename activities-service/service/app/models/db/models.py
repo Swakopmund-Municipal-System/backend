@@ -68,5 +68,6 @@ class ActivityReview(Base):
     user_id = Column(UUID, index=True)
     rating = Column(Integer, index=False)
     review_text = Column(String(512), index=False)
-
     activity = relationship("Activity", back_populates="reviews")
+
+    created_at = Column(TIMESTAMP, index=False)
