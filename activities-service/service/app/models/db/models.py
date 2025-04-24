@@ -34,6 +34,8 @@ class Activity(Base):
     longitude = Column(Float, index=True)
     point_geom = Column(Geometry(geometry_type="POINT", srid=4326))
 
+    reviews = relationship("ActivityReview", back_populates="activity")
+
 
 class Image(Base):
     __tablename__ = "images"
@@ -54,3 +56,17 @@ class ActivityImage(Base):
     activity_id = Column(
         Integer, ForeignKey("activities.id", ondelete="CASCADE"), nullable=False
     )
+
+
+class ActivityReview(Base):
+    __tablename__ = "activity_reviews"
+
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    activity_id = Column(
+        Integer, ForeignKey("activities.id", ondelete="CASCADE"), nullable=False
+    )
+    user_id = Column(UUID, index=True)
+    rating = Column(Integer, index=False)
+    review_text = Column(String(512), index=False)
+
+    activity = relationship("Activity", back_populates="reviews")
