@@ -28,4 +28,5 @@
 ## Running the tests
 - the tests require an instance of postgres to be running. In this case we can use the development postgres container created above.
    - In github actions, an instance of postgres must be created for the tests to run.
+- make sure to export the DATABASE_URL environment variable as above
 - in the root folder (`/app`), run `bash scripts/runTests.sh` to run the tests

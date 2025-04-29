@@ -61,3 +61,9 @@ class ActivityReviewSearchResultDTO(BaseModel):
         ..., example="Great experience!", min_length=3, max_length=512
     )
     created_at: str = Field(..., example="2023-10-01T12:00:00Z")
+
+
+class AuthenticatedUserDTO(BaseModel):
+    id: str = Field(..., example="123e4567-e89b-12d3-a456-426614174000")
+    email: str = Field(..., example="abc@a.com")
+    is_staff: bool = Field(..., example=False)

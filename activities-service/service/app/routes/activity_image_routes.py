@@ -5,12 +5,14 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.models.db.models import Image
+from app.models.dto.models import AuthenticatedUserDTO
 from app.services.activity_images_service import (
     add_images_for_activity,
     delete_image_by_id,
     get_image_ids_for_activity,
     set_hero_image_for_activity,
 )
+from app.services.auth_service import authenticate_user
 
 ALLOWED_MIME_TYPES = ["image/png", "image/jpeg"]
 
