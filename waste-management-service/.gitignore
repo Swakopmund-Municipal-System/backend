@@ -1,0 +1,11 @@
+db-data/
+pg-admin-data/
+.env
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.venv/
+.vscode-server/
+*.db

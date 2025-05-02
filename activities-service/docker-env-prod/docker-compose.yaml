@@ -1,0 +1,49 @@
+services:
+
+  db:
+    image: postgis/postgis:17-3.5
+    restart: always
+    shm_size: 4G
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: waste-management-service
+    ports:
+      - 5432:5432
+    volumes:
+      - 'db_Data:/var/lib/postgresql/data'
+    networks:
+      - my-network
+
+  pg-admin:
+    image: dpage/pgadmin4:latest
+    depends_on:
+      - db
+    environment:
+      PGADMIN_DEFAULT_EMAIL: adriaanscorne@gmail.com
+      PGADMIN_DEFAULT_PASSWORD: password
+    restart: always
+    ports:
+      - 8096:80
+    volumes:
+      - 'pg_admin_data:/var/lib/pgadmin'
+    networks:
+      - my-network
+
+  app:
+    build:
+      context: ../
+      dockerfile: ./docker-env-prod/app.Dockerfile
+    ports:
+      - "8001:8000"
+    networks:
+      - my-network
+
+volumes:
+  db_Data:
+  pg_admin_data:
+
+networks:
+  my-network:
+    name: swakopmund-revamp
+

@@ -1,0 +1,88 @@
+name: CI - Dynamic Microservice Builds
+
+on:
+  pull_request:
+    branches: [ dev ]
+    types: [closed]
+
+jobs:
+
+  discover-services:
+    name: Discover Microservices
+    if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'dev'
+    runs-on: ubuntu-latest
+    outputs:
+      services: ${{ steps.set-matrix.outputs.services }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Discover service folders
+        id: set-matrix
+        run: |
+          echo "Finding service folders in root directory..."
+          folders=$(find . -mindepth 1 -maxdepth 1 -type d \
+            \( -name '.github' -o -name '.vscode' -o -name '.git' \) -prune -o -print | sed 's|^\./||')
+
+          folders=$(echo "$folders" | grep -v -E '^(\.git|\.github|\.vscode|README.md|.dockerignore|compose.yaml)$')
+
+          echo "Found folders:"
+          echo "$folders"
+
+          json_array=$(printf '%s\n' $folders | jq -R . | jq -s -c .)
+          echo "services=$json_array" >> "$GITHUB_OUTPUT"
+
+  build:
+    name: Build - ${{ matrix.service }}
+    needs: discover-services
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        service: ${{ fromJson(needs.discover-services.outputs.services) }}
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Copy .env if exists
+        run: |
+          SERVICE_DIR=${{ matrix.service }}
+          if [ -f "$SERVICE_DIR/.env" ]; then
+            echo ".env found, copying for CI build"
+            cp "$SERVICE_DIR/.env" "$SERVICE_DIR/.env.ci"
+          fi
+
+      - name: Build Service
+        run: |
+          SERVICE=${{ matrix.service }}
+          SERVICE_DIR=$SERVICE
+          echo "Building $SERVICE"
+
+          if [ -f "$SERVICE_DIR/docker-env-dev/docker-compose.yaml" ]; then
+            echo "Using docker-compose (docker compose V2)"
+            docker compose -f "$SERVICE_DIR/docker-env-dev/docker-compose.yaml" build
+          elif [ -f "$SERVICE_DIR/docker-env-dev/app.Dockerfile" ]; then
+            echo "Using app.Dockerfile from docker-env-dev"
+            docker build -f "$SERVICE_DIR/docker-env-dev/app.Dockerfile" -t $SERVICE:latest "$SERVICE_DIR/docker-env-dev"
+          else
+            echo "Skipping $SERVICE — no docker-env-dev/app.Dockerfile or docker-compose.yaml found."
+            exit 0
+          fi
+
+      - name: Notify on Success (Discord)
+        if: success()
+        run: |
+          curl -X POST ${{ secrets.DISCORD_WEBHOOK_URL }} \
+            -H "Content-Type: application/json" \
+            -d "{\"content\": \"CI Success: ${{ matrix.service }} built successfully!\"}"
+
+      - name: Notify on Failure (Discord)
+        if: failure()
+        run: |
+          curl -X POST ${{ secrets.DISCORD_WEBHOOK_URL }} \
+            -H "Content-Type: application/json" \
+            -d "{\"content\": \"CI Failed: ${{ matrix.service }} failed or was skipped due to missing Docker files.\"}"
