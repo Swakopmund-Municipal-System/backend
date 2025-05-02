@@ -1,5 +1,20 @@
 services:
-  
+
+  nginx:
+    image: nginx:latest
+    container_name: swakop-backend
+    ports:
+      - "8080:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+    networks:
+      - swakop-backend
+    environment:
+      NGINX_HOST: localhost
+      NGINX_PORT: 80
+    depends_on:
+      - authentication
+
   rabbitmq:
     image: rabbitmq:management
     container_name: swakop-rabbitmq
@@ -13,6 +28,22 @@ services:
       RABBITMQ_DEFAULT_PASS: password
     networks:
       - swakop-backend
+
+  authentication:
+    build:
+      context: ./auth-service
+      dockerfile: Dockerfile
+    container_name: swakop-auth-service
+    networks:
+      - swakop-backend
+    depends_on:
+      - auth_database
+    environment:
+      DATABASE: ${AUTH_DB}
+      USER: ${AUTH_USER}
+      PASSWORD: ${AUTH_PASSWORD}
+      HOST: ${AUTH_HOST}
+      PORT: ${AUTH_PORT}
 
   auth_database:
     image: postgres:latest
@@ -35,4 +66,4 @@ networks:
 volumes:
   rabbitmq_data:
   auth_db_data:
-    
+  auth_db_data:

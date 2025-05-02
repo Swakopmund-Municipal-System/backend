@@ -25,12 +25,17 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-ma*e_vi6=*&y3o8b_4k4@05l451my07+)yzlfgm_$we0_po+9m'
+SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
 
-ALLOWED_HOSTS = []
+ENVIRONMENT = os.environ.get('ENVIRONMENT')
+DEBUG = ENVIRONMENT != 'production'
+
+if ENVIRONMENT == 'production':
+    ALLOWED_HOSTS = [os.environ.get('AUTH_HOST')]
+else:
+    ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -48,6 +53,7 @@ INSTALLED_APPS = [
     'knox',
     'application',
     'user',
+    'drf_spectacular',
 ]
 
 MIDDLEWARE = [
@@ -149,8 +155,15 @@ REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': (
         'django_filters.rest_framework.DjangoFilterBackend',
     ),
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema'
 }
 
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Swakopmund Municipality Auth Service',
+    'DESCRIPTION': 'API for the Swakopmund Municipality Auth Service',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+}
 
 KNOX_TOKEN_MODEL = 'knox.AuthToken'
 
