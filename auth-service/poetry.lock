@@ -518,6 +518,21 @@ django = ">=4.2"
 djangorestframework = "*"
 
 [[package]]
+name = "django-unfold"
+version = "0.55.3"
+description = "Modern Django admin theme for seamless interface development"
+optional = false
+python-versions = ">=3.9"
+groups = ["main"]
+files = [
+    {file = "django_unfold-0.55.3-py3-none-any.whl", hash = "sha256:511db366c2e4a139aab01e741e899edcb192512ef7c8bb290c7ce71f6900c0c8"},
+    {file = "django_unfold-0.55.3.tar.gz", hash = "sha256:a84c6c9b3da968cb7868300fb229907c845aabfa68fa46cfd50f11e636bd6f1f"},
+]
+
+[package.dependencies]
+django = ">=4.2"
+
+[[package]]
 name = "djangorestframework"
 version = "3.16.0"
 description = "Web APIs for Django, made easy."
@@ -1395,4 +1410,4 @@ testing = ["coverage[toml]", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.11"
-content-hash = "9f36ada92a11f46d99a480f297366fcb0c65b33a130ffdf0ad977d935b830947"
+content-hash = "f071fc40131bf3a692820e679609587306ead29c22d65d7855c79b56a94c5b2f"

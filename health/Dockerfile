@@ -27,7 +27,6 @@ FROM python:3.13-slim as runtime
 
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONDONTWRITEBYTECODE=1
-ENV DJANGO_SETTINGS_MODULE=authservice.settings
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libpq5 \
@@ -49,11 +48,9 @@ COPY --chown=swakopmund_marine:swakopmund_marine . .
 COPY --chown=swakopmund_marine:swakopmund_marine entrypoint.sh /app/entrypoint.sh
 RUN chmod +x /app/entrypoint.sh
 
-
 USER swakopmund_marine
 
-
-EXPOSE 9080
+EXPOSE 8001
 
 ENTRYPOINT [ "/app/entrypoint.sh" ]
-CMD ["daphne", "-b", "0.0.0.0", "-p",  "9080", "authservice.asgi:application" ]
+CMD ["daphne", "-b", "0.0.0.0", "-p",  "8001", "health.asgi:application" ]

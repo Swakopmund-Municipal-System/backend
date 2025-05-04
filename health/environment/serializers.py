@@ -37,6 +37,7 @@ class ReportSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         if request and hasattr(request, 'user') and hasattr(request.user, 'auth_data'):
             auth_data = request.user.auth_data
+
             if auth_data.get('user'):
                 return {
                     'id': auth_data['user']['user']['id'],
@@ -58,11 +59,11 @@ class ReportSerializer(serializers.ModelSerializer):
                 validated_data['created_by'] = user_info['email']
             elif user_info.get('application'):
                 validated_data['created_by'] = user_info['application']
-        
+
         # Ensure report_id is generated if not provided
         if 'report_id' not in validated_data:
             validated_data['report_id'] = str(uuid.uuid4())
-            
+
         return super().create(validated_data)
 
     def update(self, instance, validated_data):
@@ -72,7 +73,7 @@ class ReportSerializer(serializers.ModelSerializer):
                 validated_data['updated_by'] = user_info['email']
             elif user_info.get('application'):
                 validated_data['updated_by'] = user_info['application']
-        
+
         return super().update(instance, validated_data)
 
     def to_representation(self, instance):
@@ -82,3 +83,5 @@ class ReportSerializer(serializers.ModelSerializer):
         if user_info and user_info.get('user_types'):
             representation['creator_user_types'] = user_info['user_types']
         return representation
+
+

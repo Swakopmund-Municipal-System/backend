@@ -25,6 +25,11 @@ from application.models import Application, Resource, SubResource, ApplicationRe
 from .models import User, UserType, UserResourcePermission
 from .serializers import UserCreateSerializer, UserSerializer, AuthenticateUserSerializer
 
+
+# API Documentation
+from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiResponse, OpenApiExample
+from drf_spectacular.types import OpenApiTypes
+
 # Create your views here.
 class CheckUserPermission(APIView):
     """
@@ -42,6 +47,127 @@ class CheckUserPermission(APIView):
         'DELETE': 'admin',
     }
 
+    @extend_schema(
+        operation_id='check_user_permission',
+        summary='Check user permissions for a resource',
+        description='Verifies if the user has the required permissions to access a specific resource and sub-resource using their authentication token and the requested HTTP method.',
+        parameters=[
+            OpenApiParameter(
+                name='X-API-KEY',
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.HEADER,
+                description='API key for application authentication (optional)',
+                required=False
+            ),
+            OpenApiParameter(
+                name='Authorization',
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.HEADER,
+                description='Knox authentication token in format "Token {token}"',
+                required=False,
+                examples=[
+                    OpenApiExample(
+                        'Auth Example',
+                        value='Token abc123def456ghi789'
+                    )
+                ]
+            ),
+            OpenApiParameter(
+                name='X-RESOURCE',
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.HEADER,
+                description='The main resource being accessed',
+                required=True
+            ),
+            OpenApiParameter(
+                name='X-SUB-RESOURCE',
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.HEADER,
+                description='The specific sub-resource being accessed',
+                required=True
+            ),
+            OpenApiParameter(
+                name='X-METHOD',
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.HEADER,
+                description='The HTTP method that will be used (GET, POST, PUT, PATCH, DELETE)',
+                required=False,
+                default='GET',
+                enum=['GET', 'POST', 'PUT', 'PATCH', 'DELETE']
+            ),
+        ],
+        request=None,
+        responses={
+            200: OpenApiResponse(
+                description='User is authorized',
+                examples=[
+                    OpenApiExample(
+                        'Authenticated Success',
+                        value={
+                            'status': 'authorised',
+                            'user': {'id': 'user_id', 'email': 'user@example.com'},
+                            'permission': 'write',
+                            'user_types': ['admin', 'editor']
+                        }
+                    ),
+                    OpenApiExample(
+                        'Anonymous Success',
+                        value={
+                            'status': 'authorised',
+                            'anonymous': True,
+                            'permission': 'read',
+                            'message': "Anonymous read access granted"
+                        }
+                    )
+                ]
+            ),
+            400: OpenApiResponse(
+                description='Missing required headers',
+                examples=[
+                    OpenApiExample(
+                        'Missing Headers',
+                        value={
+                            'error': 'x-resource and x-sub-resource headers are required'
+                        }
+                    )
+                ]
+            ),
+            401: OpenApiResponse(
+                description='Authentication required or invalid token',
+                examples=[
+                    OpenApiExample(
+                        'Auth Required',
+                        value={
+                            'error': 'Authentication required for this resource'
+                        }
+                    ),
+                    OpenApiExample(
+                        'Invalid Token',
+                        value={
+                            'error': 'Invalid authentication token'
+                        }
+                    )
+                ]
+            ),
+            403: OpenApiResponse(
+                description='Insufficient permissions',
+                examples=[
+                    OpenApiExample(
+                        'Anonymous Not Allowed',
+                        value={
+                            'error': 'Anonymous access only allows GET requests'
+                        }
+                    ),
+                    OpenApiExample(
+                        'Permission Error',
+                        value={
+                            'error': 'Requires write permission but only has read'
+                        }
+                    )
+                ]
+            )
+        }
+    )
     def post(self, request):
         # Extract headers from the request
         headers = {
@@ -158,8 +284,7 @@ class CheckUserPermission(APIView):
                 "error": f"Requires {required_permission} permission but only has {highest_permission}"
             }, status=status.HTTP_403_FORBIDDEN)
 
-
-        
+      
 class LoginView(KnoxLoginView):
     """
     Override the Knox LoginView.
@@ -167,6 +292,45 @@ class LoginView(KnoxLoginView):
     serialzer_class = AuthenticateUserSerializer
     permission_classes = [AllowAny]
     
+    @extend_schema(
+        request=AuthenticateUserSerializer,
+        responses={
+            200: OpenApiResponse(
+                description="Successful authentication",
+                response=OpenApiTypes.OBJECT,
+                examples=[
+                    OpenApiExample(
+                        name="Success response",
+                        value={
+                            "token": "string",
+                            "expiry": "2023-01-01T00:00:00Z"
+                        }
+                    )
+                ]
+            ),
+            400: OpenApiResponse(
+                description="Invalid input",
+                response=OpenApiTypes.OBJECT,
+                examples=[
+                    OpenApiExample(
+                        name="Invalid credentials",
+                        value={
+                            "detail": "Invalid credentials."
+                        }
+                    )
+                ]
+            )
+        },
+        examples=[
+            OpenApiExample(
+                name="Login example",
+                value={
+                    "email": "user@example.com",
+                    "password": "string"
+                }
+            )
+        ]
+    )
     def post(self, request, format=None):
         serializer = AuthTokenSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -182,6 +346,51 @@ class CreateUserView(APIView):
     
     permission_classes = [AllowAny]
     
+    @extend_schema(
+        request=UserCreateSerializer,
+        responses={
+            201: OpenApiResponse(
+                description="User created successfully",
+                response=UserCreateSerializer,
+                examples=[
+                    OpenApiExample(
+                        name="Success response",
+                        value={
+                            "email": "user@example.com",
+                            "first_name": "John",
+                            "last_name": "Doe"
+                        }
+                    )
+                ]
+            ),
+            400: OpenApiResponse(
+                description="Invalid input data",
+                response=OpenApiTypes.OBJECT,
+                examples=[
+                    OpenApiExample(
+                        name="Validation error",
+                        value={
+                            "email": ["This field is required."],
+                            "password": ["This field is required."],
+                            "user_type_names": ["This field is required."]
+                        }
+                    )
+                ]
+            )
+        },
+        examples=[
+            OpenApiExample(
+                name="Registration example",
+                value={
+                    "email": "user@example.com",
+                    "password": "securepassword123",
+                    "first_name": "John",
+                    "last_name": "Doe",
+                    "user_type_names": ["municipal_staff", "contractor"]
+                }
+            )
+        ]
+    )
     def post(self, request):
         serializer = UserCreateSerializer(data=request.data)
         if serializer.is_valid():
@@ -198,6 +407,73 @@ class ValidateUserTokenView(APIView):
     authentication_classes = []
     permission_classes = [AllowAny]
     
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name='Authorization',
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.HEADER,
+                description='Knox token in format: Token <token_value>',
+                required=True,
+                examples=[
+                    OpenApiExample(
+                        name="User Token",
+                        value='Token 9944b09199c62bcf9418ad846dd0e4bbdfc6ee4b'
+                    )
+                ]
+            )
+        ],
+        responses={
+            200: OpenApiResponse(
+                description="Token is valid",
+                response=OpenApiTypes.OBJECT,
+                examples=[
+                    OpenApiExample(
+                        name="Success response",
+                        value={
+                            "status": "authorised",
+                            "user": {
+                                "email": "user@example.com",
+                                "first_name": "John",
+                                "last_name": "Doe",
+                                "user_types": ["municipal_staff", "contractor"]
+                            },
+                            "token_expiry": "2023-12-31T23:59:59Z"
+                        }
+                    )
+                ]
+            ),
+            401: OpenApiResponse(
+                description="Invalid token or missing authorization",
+                response=OpenApiTypes.OBJECT,
+                examples=[
+                    OpenApiExample(
+                        name="Missing header",
+                        value={"error": "Authorization header is required"}
+                    ),
+                    OpenApiExample(
+                        name="Invalid token",
+                        value={"error": "Invalid token"}
+                    ),
+                    OpenApiExample(
+                        name="Invalid format",
+                        value={"error": "Invalid authorization header format"}
+                    )
+                ]
+            )
+        },
+        auth=None,
+        summary="Validate authentication token",
+        description="""
+        Validates a Knox token and returns user information if valid.
+        
+        The token must be provided in the Authorization header with 'Token' prefix.
+        Example:
+        ```
+        Authorization: Token 9944b09199c62bcf9418ad846dd0e4bbdfc6ee4b
+        ```
+        """
+    )
     def post(self, request):
         
         auth_header = request.headers.get('Authorization', '')
