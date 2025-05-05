@@ -3,6 +3,7 @@ import sys
 import os
 import uuid
 
+
 # force add the parent directory to the path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
@@ -14,6 +15,14 @@ from app.main import app
 from app.database import Base, get_db, get_engine, get_session
 from app.models.db.models import Activity, ActivityReview, Image, ActivityImage
 from app.models.enums.enums import ActivityType
+from app.services.auth_service import (
+    authenticate_request,
+    authenticate_request_with_user,
+    authentication_override,
+)
+
+
+TEST_DATABASE_URL_WITHOUT_DB_NAME = os.getenv("TEST_DATABASE_URL_WITHOUT_DB_NAME")
 
 
 @pytest.fixture(scope="function")
@@ -21,9 +30,9 @@ def test_db():
     """Creates a fresh test DB and seeds it before each test."""
 
     db_name = f"test{uuid.uuid4().hex.replace('-', '')}"
-    db_url = f"postgresql://postgres:postgres@db/{db_name}"
+    db_url = f"{TEST_DATABASE_URL_WITHOUT_DB_NAME}/{db_name}"
 
-    admin_engine = create_engine(f"postgresql://postgres:postgres@db/postgres")
+    admin_engine = create_engine(f"{TEST_DATABASE_URL_WITHOUT_DB_NAME}/postgres")
 
     admin_conn = admin_engine.connect()
     admin_conn.execution_options(isolation_level="AUTOCOMMIT")
@@ -78,8 +87,8 @@ def test_db():
                 address="123 Festival St, City, Country",
                 created_at=datetime.datetime.now(),
                 updated_at=datetime.datetime.now(),
-                created_by=uuid.uuid4(),
-                updated_by=uuid.uuid4(),
+                created_by=1,
+                updated_by=1,
                 booking_url="http://example.com/booking",
                 hero_image_id=1,
                 latitude=-22.592063343286743,
@@ -94,8 +103,8 @@ def test_db():
                 address="456 Concert Ave, City, Country",
                 created_at=datetime.datetime.now(),
                 updated_at=datetime.datetime.now(),
-                created_by=uuid.uuid4(),
-                updated_by=uuid.uuid4(),
+                created_by=1,
+                updated_by=1,
                 booking_url="http://example.com/booking",
                 hero_image_id=2,
                 latitude=-22.54742520993337,
@@ -122,7 +131,7 @@ def test_db():
             ActivityReview(
                 id=1,
                 activity_id=1,
-                user_id=uuid.uuid4(),
+                user_id=1,
                 review_text="Great festival!",
                 rating=5,
                 created_at=datetime.datetime.now(),
@@ -130,7 +139,7 @@ def test_db():
             ActivityReview(
                 id=2,
                 activity_id=1,
-                user_id=uuid.uuid4(),
+                user_id=1,
                 review_text="Amazing concert!",
                 rating=4,
                 created_at=datetime.datetime.now(),
@@ -183,7 +192,44 @@ def client(test_db):
         finally:
             test_db.close()
 
+    def override_authenticate_request():
+        return {
+            "app": {
+                "status": "authorised",
+                "application": "test",
+                "resource": "activities-services",
+                "permission": "admin",
+            },
+            "user": {
+                "status": "authorised",
+                "user": {"id": 1, "email": "admin@admin.com"},
+                "permission": "read,write",
+                "user_types": [
+                    "resident",
+                    "tourist",
+                    "property-developer",
+                    "planning-department",
+                    "law-enforcement",
+                    "waste-management",
+                    "health-services",
+                    "community-services",
+                    "business-owner",
+                    "restaurant-owner",
+                    "accommodation-provider",
+                    "building-inspector",
+                    "environmental-officer",
+                    "funeral-home",
+                    "event-organizer",
+                    "library-staff",
+                    "business-support",
+                    "fire-department",
+                ],
+            },
+        }
+
     app.dependency_overrides[get_db] = override_get_db
+    app.dependency_overrides[authentication_override] = override_authenticate_request
+
     from fastapi.testclient import TestClient
 
     return TestClient(app)

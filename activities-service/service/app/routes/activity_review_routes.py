@@ -12,6 +12,12 @@ from app.services.activity_reviews_service import (
     delete_activity_review_by_id,
     search_activity_reviews,
 )
+from app.services.auth_service import (
+    RESOURCE_NAME,
+    authenticate_request,
+    authenticate_request_with_user,
+    get_auth_headers,
+)
 
 router = APIRouter()
 
@@ -25,11 +31,18 @@ router = APIRouter()
         500: {"description": "Internal server error."},
     },
 )
-async def create_new_activity(
+async def create_new_activity_review(
     data: CreateReviewDTO,
     db: Session = Depends(get_db),
+    auth_data: dict = Depends(
+        authenticate_request_with_user(
+            RESOURCE_NAME, "review-activities", "create-review"
+        )
+    ),
 ):
-    (created_review_id, status_code, err_message) = create_activity_review(db, data)
+    (created_review_id, status_code, err_message) = create_activity_review(
+        db, data, auth_data["user"]["user"]["id"]
+    )
     if status_code != 201:
         raise HTTPException(status_code=status_code, detail=err_message)
 
@@ -47,7 +60,7 @@ async def create_new_activity(
         500: {"description": "Internal server error."},
     },
 )
-async def get_activities(
+async def get_reviews(
     search_term: str = "",
     sort_field: str = "id",
     sort_order: str = "desc",
@@ -55,6 +68,9 @@ async def get_activities(
     page: int = 1,
     activity_id: int = 0,
     db: Session = Depends(get_db),
+    auth_data: dict = Depends(
+        authenticate_request(RESOURCE_NAME, "review-activities", "create-review")
+    ),
 ):
     try:
         return search_activity_reviews(
@@ -72,9 +88,12 @@ async def get_activities(
         500: {"description": "Internal server error."},
     },
 )
-async def delete_activity(
+async def delete_activity_review(
     review_id: int,
     db: Session = Depends(get_db),
+    auth_data: dict = Depends(
+        authenticate_request(RESOURCE_NAME, "review-activities", "delete-review")
+    ),
 ):
     (success, status_code, err_message) = delete_activity_review_by_id(db, review_id)
     if status_code != 200:

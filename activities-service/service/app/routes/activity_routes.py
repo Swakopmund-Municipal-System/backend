@@ -15,6 +15,11 @@ from app.services.activities_service import (
     search_activities,
     search_activities_by_location,
 )
+from app.services.auth_service import (
+    RESOURCE_NAME,
+    authenticate_request,
+    authenticate_request_with_user,
+)
 
 router = APIRouter()
 
@@ -38,7 +43,13 @@ async def create_new_activity(
     booking_url: str = Form(...),
     hero_image: Optional[UploadFile] = File(None),
     db: Session = Depends(get_db),
+    auth_data: dict = Depends(
+        authenticate_request_with_user(
+            RESOURCE_NAME, "modify-activities", "create-activity"
+        )
+    ),
 ):
+    print("auth data for create", auth_data)
 
     try:
         activity_data = ActivityCreateDTO(
@@ -56,7 +67,9 @@ async def create_new_activity(
     except ValidationError as e:
         raise HTTPException(status_code=400, detail=e.errors())
 
-    (created_activity_id, status_code, err_message) = create_activity(db, activity_data)
+    (created_activity_id, status_code, err_message) = create_activity(
+        db, activity_data, auth_data["user"]["user"]["id"]
+    )
     if status_code != 201:
         raise HTTPException(status_code=status_code, detail=err_message)
 
@@ -82,6 +95,9 @@ async def get_activities(
     page: int = 1,
     categories: Optional[str] = None,
     db: Session = Depends(get_db),
+    auth_data: dict = Depends(
+        authenticate_request(RESOURCE_NAME, "fetch-activities", "get-activities")
+    ),
 ):
     try:
         return search_activities(
@@ -106,6 +122,11 @@ async def get_activities_by_location(
     search_term: str = "",
     categories: Optional[str] = None,
     db: Session = Depends(get_db),
+    auth_data: dict = Depends(
+        authenticate_request(
+            RESOURCE_NAME, "fetch-activities", "get-activities-by-location"
+        )
+    ),
 ):
     try:
         return search_activities_by_location(
@@ -127,8 +148,15 @@ async def get_activities_by_location(
 async def update_activity(
     data: ActivityEditDTO,
     db: Session = Depends(get_db),
+    auth_data: dict = Depends(
+        authenticate_request_with_user(
+            RESOURCE_NAME, "modify-activities", "edit-activity"
+        )
+    ),
 ):
-    (success, status_code, err_message) = edit_activity(db, data)
+    (success, status_code, err_message) = edit_activity(
+        db, data, auth_data["user"]["user"]["id"]
+    )
     if status_code != 200:
         raise HTTPException(status_code=status_code, detail=err_message)
 
@@ -149,6 +177,9 @@ async def update_activity(
 async def delete_activity(
     activity_id: int,
     db: Session = Depends(get_db),
+    auth_data: dict = Depends(
+        authenticate_request(RESOURCE_NAME, "modify-activities", "delete-activity")
+    ),
 ):
     (success, status_code, err_message) = delete_activity_by_id(db, activity_id)
     if status_code != 200:
@@ -171,6 +202,9 @@ async def delete_activity(
 async def get_activity(
     activity_id: int,
     db: Session = Depends(get_db),
+    auth_data: dict = Depends(
+        authenticate_request(RESOURCE_NAME, "fetch-activities", "get-activity")
+    ),
 ):
     (activity_data, status_code, err_message) = get_activity_by_id(db, activity_id)
     if status_code != 200:

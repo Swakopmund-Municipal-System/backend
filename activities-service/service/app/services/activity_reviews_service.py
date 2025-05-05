@@ -63,7 +63,9 @@ def search_activity_reviews(
         return []
 
 
-def create_activity_review(db: Session, data: CreateReviewDTO) -> tuple[int, int, str]:
+def create_activity_review(
+    db: Session, data: CreateReviewDTO, user_id: int
+) -> tuple[int, int, str]:
     try:
 
         activity = db.query(Activity).filter(Activity.id == data.activity_id).first()
@@ -72,7 +74,7 @@ def create_activity_review(db: Session, data: CreateReviewDTO) -> tuple[int, int
 
         insert_data = ActivityReview(
             activity_id=data.activity_id,
-            user_id=data.user_id,
+            user_id=user_id,
             review_text=data.review,
             rating=data.rating,
             created_at=text("NOW()"),

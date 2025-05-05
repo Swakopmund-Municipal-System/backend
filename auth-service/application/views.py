@@ -116,13 +116,14 @@ class CheckApplicationPermissionView(APIView):
             )
 
             # Check if the highest permission meets the requirement
+            print(f"Highest App Permission: {highest_app_permission}")
             if permission_hierarchy.index(highest_app_permission) < permission_hierarchy.index(required_permission):
-                return Response({"error": "Permission denied"},
+                return Response({"error": "Permission denied, insufficient permissions"},
                                 status=status.HTTP_403_FORBIDDEN
                                 )
 
         except ApplicationResourcePermission.DoesNotExist:
-            return Response({"error": "Permission denied"},
+            return Response({"error": "Permission denied, resource permission not found"},
                             status=status.HTTP_403_FORBIDDEN
                             )
 

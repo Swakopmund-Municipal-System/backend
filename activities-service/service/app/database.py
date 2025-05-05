@@ -5,7 +5,7 @@ import os
 
 DATABASE_URL = os.getenv(
     "DATABASE_URL",
-    f"postgresql://postgres:postgres@db/{uuid.uuid4().hex.replace('-', '')}",
+    f"postgresql://postgres:postgres@0.0.0.0/{uuid.uuid4().hex.replace('-', '')}",
 )
 
 Base = declarative_base()
