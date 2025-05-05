@@ -69,11 +69,40 @@ services:
       PORT: ${HEALTH_PORT}
       AUTH_SERVER_URL: ${AUTH_SERVER_URL}
 
+  event:
+    build:
+      context: ./events
+      dockerfile: Dockerfile
+    container_name: swakop-event-service
+    networks:
+      - swakop-backend
+    depends_on:
+      - event_database
+    environment:
+      DATABASE: ${EVENT_DB}
+      USER: ${EVENT_USER}
+      PASSWORD: ${EVENT_PASSWORD}
+      HOST: ${EVENT_HOST}
+      PORT: ${EVENT_PORT}
+      AUTH_SERVER_URL: ${AUTH_SERVER_URL}
+
+  
+  restaurant:
+    build:
+      context: ./restaurant_service_python
+      dockerfile: Dockerfile
+    container_name: swakop-restaurant-service
+    networks:
+      - swakop-backend
+    depends_on:
+      - restaurant_database
+    environment:
+      DATABASE_URL: ${RESTAURANT_DB_URL}
+      AUTH_SERVER_URL: ${AUTH_SERVER_URL}
+
   auth_database:
     image: postgres:latest
     container_name: swakop-auth-db
-    ports:
-      - "8090:5432"
     environment:
       POSTGRES_USER: auth_user
       POSTGRES_PASSWORD: auth_password
@@ -86,14 +115,36 @@ services:
   health_database:
     image: postgres:latest
     container_name: swakop-health-db
-    ports:
-      - "9090:5432"
     environment:
       POSTGRES_USER: health_user
       POSTGRES_PASSWORD: health_password
       POSTGRES_DB: health_db
     volumes:
       - health_db_data:/var/lib/postgresql/data
+    networks:
+      - swakop-backend
+
+  restaurant_database:
+    image: postgres:latest
+    container_name: swakop-restaurant-db
+    environment:
+      POSTGRES_USER: restaurant_user
+      POSTGRES_PASSWORD: restaurant_password
+      POSTGRES_DB: restaurant_db
+    volumes:
+      - restaurant_db_data:/var/lib/postgresql/data
+    networks:
+      - swakop-backend
+
+  event_database:
+    image: postgres:latest
+    container_name: swakop-event-db
+    environment:
+      POSTGRES_USER: event_user
+      POSTGRES_PASSWORD: event_password
+      POSTGRES_DB: event_db
+    volumes:
+      - event_db_data:/var/lib/postgresql/data
     networks:
       - swakop-backend
 
@@ -118,5 +169,7 @@ volumes:
   rabbitmq_data:
   auth_db_data:
   health_db_data:
+  restaurant_db_data:
+  event_db_data:
   auth_static:
   

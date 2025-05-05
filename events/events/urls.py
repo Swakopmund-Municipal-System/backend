@@ -42,5 +42,5 @@ api_urlpatterns = [
 ]
 
 urlpatterns = [
-    path('api/event/v1/', include(api_urlpatterns)),
+    path('api/event/', include(api_urlpatterns)),
 ]
