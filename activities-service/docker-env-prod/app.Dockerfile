@@ -1,4 +1,4 @@
-FROM python:3.10-slim-bullseye
+FROM python:3.11-slim-bullseye
 
 WORKDIR /app
 
@@ -13,9 +13,9 @@ RUN apt-get update && apt-get install -y \
     python3-dev \
     && apt-get clean 
 
-COPY ./app /app
+COPY ./service /app
 
 RUN pip install --no-cache-dir -r requirements.txt 
 
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "-w", "4", "-k", "uvicorn.workers.UvicornWorker", "run:app"]
+CMD ["gunicorn", "--bind", "0.0.0.0:8004", "-w", "4", "-k", "uvicorn.workers.UvicornWorker", "run:app"]
 
