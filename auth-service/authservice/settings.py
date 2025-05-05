@@ -25,18 +25,27 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-ma*e_vi6=*&y3o8b_4k4@05l451my07+)yzlfgm_$we0_po+9m'
+SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
 
-ALLOWED_HOSTS = []
+ENVIRONMENT = os.environ.get('ENVIRONMENT')
+DEBUG = ENVIRONMENT != 'production'
+
+if ENVIRONMENT == 'production':
+    ALLOWED_HOSTS = [os.environ.get('AUTH_HOST'), os.environ.get('AUTH_SERVER')]
+else:
+    ALLOWED_HOSTS = []
 
 
 # Application definition
 
 INSTALLED_APPS = [
     'daphne',
+    'unfold',
+    'unfold.contrib.filters',
+    'unfold.contrib.forms',
+    'unfold.contrib.inlines',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -48,6 +57,7 @@ INSTALLED_APPS = [
     'knox',
     'application',
     'user',
+    'drf_spectacular',
 ]
 
 MIDDLEWARE = [
@@ -129,7 +139,15 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+
+STATIC_ROOT = '/app/staticfiles'
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
+
+#FORCE_SCRIPT_NAME = '/api/auth'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -149,8 +167,22 @@ REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': (
         'django_filters.rest_framework.DjangoFilterBackend',
     ),
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema'
 }
 
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Swakopmund Municipality Auth Service',
+    'DESCRIPTION': 'API for the Swakopmund Municipality Auth Service',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    'SCHEMA_PATH_PREFIX': '/api/',
+
+    'SWAGGER_UI_SETTINGS': {
+        'deepLinking': True,
+        'displayRequestDuration': True,
+        'filter': True,
+    },
+}
 
 KNOX_TOKEN_MODEL = 'knox.AuthToken'
 
@@ -170,3 +202,20 @@ REST_KNOX = {
 
 # Authentication
 AUTH_USER_MODEL = 'user.User'
+
+CSRF_TRUSTED_ORIGINS = [
+    'http://0.0.0.0:8080',
+    'http://localhost:8080',
+]
+
+CSRF_COOKIE_SECURE = False  # Set to True if using HTTPS
+CSRF_COOKIE_HTTPONLY = False
+CSRF_COOKIE_SAMESITE = 'Lax'  # or 'None' if cross-site
+
+SESSION_COOKIE_SECURE = False  # Set to True if using HTTPS
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = 'Lax'
+
+USE_X_FORWARDED_HOST = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+

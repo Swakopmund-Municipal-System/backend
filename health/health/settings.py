@@ -12,6 +12,9 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -21,12 +24,17 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-r^8a*n#i3k(kc^yr3wwbq9%9h(5yg*1&f299!7l4_0h6y@p7k$'
+SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
 
-ALLOWED_HOSTS = []
+ENVIRONMENT = os.environ.get('ENVIRONMENT')
+DEBUG = ENVIRONMENT != 'production'
+
+if ENVIRONMENT == 'production':
+    ALLOWED_HOSTS = [os.environ.get('HEALTH_HOST')]
+else:
+    ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -45,6 +53,7 @@ INSTALLED_APPS = [
     'authentication',
     'complaints',
     'cemeteries',
+    'drf_spectacular'
 ]
 
 MIDDLEWARE = [
@@ -82,8 +91,12 @@ WSGI_APPLICATION = 'health.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.environ.get('DATABASE'),
+        'USER': os.environ.get('USER'),
+        'PASSWORD': os.environ.get('PASSWORD'),
+        'HOST': os.environ.get('HOST'),
+        'PORT': os.environ.get('PORT'),
     }
 }
 
@@ -113,13 +126,28 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
-    )
+    ),
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema'
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Swakopmund Municipality Health Service',
+    'DESCRIPTION': 'API for the Swakopmund Municipality Health Service',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    'SCHEMA_PATH_PREFIX': '/api/',
+
+    'SWAGGER_UI_SETTINGS': {
+        'deepLinking': True,
+        'displayRequestDuration': True,
+        'filter': True,
+    },
 }
 
 OAUTH2_PROVIDER = {
     'RESOURCE_SERVER_INTROSPECTION_URL': 'http://127.0.0.1:9080/o/introspect/',
     'RESOURCE_SERVER_INTROSPECTION_CREDENTIALS': (
-        '8UMsvJH52e8XKI2zxLZUZdG6oIqmXXWiWIuRTHxL', 
+        '8UMsvJH52e8XKI2zxLZUZdG6oIqmXXWiWIuRTHxL',
         'g17ZLsj36VVfpYnaZeI8idU0qVealPLPpvoTK8BHstr7KMuvw2e4RAncHfjNxAZwX7Qc2lAJCPejl5VDcmjulQ5DXaJdE9i2yjy7ZSVF8Jb2TdjKTcv3a8wzmstqkRVY'
     ),
 }
@@ -150,7 +178,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-AUTH_SERVER_URL = 'http://127.0.0.1:9080' 
+AUTH_SERVER_URL = os.environ.get('AUTH_SERVER_URL')
 
 RUN_SERVER_PORT = 8001
 
