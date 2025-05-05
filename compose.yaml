@@ -100,6 +100,16 @@ services:
       DATABASE_URL: ${RESTAURANT_DB_URL}
       AUTH_SERVER_URL: ${AUTH_SERVER_URL}
 
+  activities:
+    build:
+      context: ./activities-service
+      dockerfile: docker-env-prod/app.Dockerfile
+    networks:
+      - swakop-backend
+    environment:
+      AUTH_SERVICE_URL: ${AUTH_SERVICE_URL}
+      DATABASE_URL: ${ACTIVITIES_DB_URL}
+
   auth_database:
     image: postgres:latest
     container_name: swakop-auth-db
@@ -148,6 +158,18 @@ services:
     networks:
       - swakop-backend
 
+  activities_database:
+    image: postgres:latest
+    container_name: swakop-activities-db
+    environment:
+      POSTGRES_USER: activities_user
+      POSTGRES_PASSWORD: activities_password
+      POSTGRES_DB: activities_db
+    volumes:
+      - activities_db_data:/var/lib/postgresql/data
+    networks:
+      - swakop-backend
+
   pgweb:
     image: sosedoff/pgweb:latest
     container_name: database-manager
@@ -171,5 +193,6 @@ volumes:
   health_db_data:
   restaurant_db_data:
   event_db_data:
+  activities_db_data:
   auth_static:
   
