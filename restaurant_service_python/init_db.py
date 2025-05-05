@@ -1,22 +1,17 @@
 import os
-from sqlalchemy import create_engine
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+from sqlalchemy import text
 from models import Base
 from dotenv import load_dotenv
 
-# Explicitly load the .env file from the current directory
-env_path = os.path.join(os.path.dirname(__file__), '.env')
-load_dotenv(dotenv_path=env_path, override=True)
+load_dotenv()
 DATABASE_URL = os.getenv("DATABASE_URL")
-print("Loaded DATABASE_URL:", DATABASE_URL)  # Debug print
 
-# Convert the asyncpg URL to a psycopg2 URL for sync operations
-sync_url = DATABASE_URL.replace("asyncpg", "psycopg2")
-print("Sync URL used:", sync_url)  # Debug print
-
-engine = create_engine(sync_url)
-
-def create_tables():
-    Base.metadata.create_all(engine)
+async def create_tables():
+    engine = create_async_engine(DATABASE_URL)
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
 
 if __name__ == "__main__":
-    create_tables()
+    import asyncio
+    asyncio.run(create_tables())

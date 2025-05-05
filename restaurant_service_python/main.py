@@ -9,16 +9,23 @@ from dotenv import load_dotenv
 from models import Base, RestaurantDB, ReviewDB
 from sqlalchemy.orm import selectinload
 
-env_path = os.path.join(os.path.dirname(__file__), '.env')
-load_dotenv(dotenv_path=env_path, override=True)
+# env_path = os.path.join(os.path.dirname(__file__), '.env')
+# load_dotenv(dotenv_path=env_path, override=True)
+load_dotenv()
 
 DATABASE_URL = os.getenv("DATABASE_URL")
+# engine = create_async_engine(DATABASE_URL, echo=True)
+# async_session = async_sessionmaker(engine, expire_on_commit=False)
 engine = create_async_engine(DATABASE_URL, echo=True)
 async_session = async_sessionmaker(engine, expire_on_commit=False)
+# SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+# Base = declarative_base()
+
 
 from fastapi.middleware.cors import CORSMiddleware
 
-app = FastAPI(title="Swakopmund Restaurant Service")
+app = FastAPI(title="Swakopmund Restaurant Service", root_path="/api/restaurants")
 
 app.add_middleware(
     CORSMiddleware,
@@ -78,7 +85,7 @@ async def get_db():
     async with async_session() as session:
         yield session
 
-@app.get("/restaurants", response_model=List[Restaurant])
+@app.get("/", response_model=List[Restaurant])
 async def get_restaurants(
     name: Optional[str] = None,
     cuisine: Optional[str] = None,
@@ -98,12 +105,12 @@ async def get_restaurants(
     result = await db.execute(query)
     return result.scalars().all()
 
-@app.get("/restaurants/featured", response_model=List[Restaurant])
+@app.get("/featured", response_model=List[Restaurant])
 async def get_featured_restaurants(db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(RestaurantDB).where(RestaurantDB.is_featured == True).options(selectinload(RestaurantDB.reviews)))
     return result.scalars().all()
 
-@app.post("/restaurants", response_model=Restaurant, status_code=201)
+@app.post("/", response_model=Restaurant, status_code=201)
 async def create_restaurant(restaurant: RestaurantCreate, db: AsyncSession = Depends(get_db)):
     new_restaurant = RestaurantDB(
         name=restaurant.name,
@@ -125,7 +132,7 @@ async def create_restaurant(restaurant: RestaurantCreate, db: AsyncSession = Dep
     await db.refresh(new_restaurant)
     return new_restaurant
 
-@app.put("/restaurants/{restaurant_id}", response_model=Restaurant)
+@app.put("/{restaurant_id}", response_model=Restaurant)
 async def update_restaurant(restaurant_id: int, restaurant: Restaurant, db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(RestaurantDB).where(RestaurantDB.id == restaurant_id))
     restaurant_db = result.scalar_one_or_none()
@@ -148,7 +155,7 @@ async def update_restaurant(restaurant_id: int, restaurant: Restaurant, db: Asyn
     await db.refresh(restaurant_db)
     return restaurant_db
 
-@app.delete("/restaurants/{restaurant_id}", status_code=204)
+@app.delete("/{restaurant_id}", status_code=204)
 async def delete_restaurant(restaurant_id: int, db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(RestaurantDB).where(RestaurantDB.id == restaurant_id))
     restaurant_db = result.scalar_one_or_none()
@@ -158,7 +165,7 @@ async def delete_restaurant(restaurant_id: int, db: AsyncSession = Depends(get_d
     await db.commit()
     return None
 
-@app.get("/restaurants/{restaurant_id}", response_model=Restaurant)
+@app.get("/{restaurant_id}", response_model=Restaurant)
 async def get_restaurant_details(restaurant_id: int, db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(RestaurantDB).where(RestaurantDB.id == restaurant_id).options(selectinload(RestaurantDB.reviews)))
     restaurant = result.scalar_one_or_none()
@@ -166,7 +173,7 @@ async def get_restaurant_details(restaurant_id: int, db: AsyncSession = Depends(
         raise HTTPException(status_code=404, detail="Restaurant not found")
     return restaurant
 
-@app.post("/restaurants/{restaurant_id}/reviews", status_code=200)
+@app.post("/{restaurant_id}/reviews", status_code=200)
 async def add_review(restaurant_id: int, review: Review, db: AsyncSession = Depends(get_db)):
     # Check restaurant exists
     result = await db.execute(select(RestaurantDB).where(RestaurantDB.id == restaurant_id).options(selectinload(RestaurantDB.reviews)))
@@ -191,4 +198,4 @@ async def add_review(restaurant_id: int, review: Review, db: AsyncSession = Depe
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000) 
+    uvicorn.run(app, host="0.0.0.0", port=8002) 
