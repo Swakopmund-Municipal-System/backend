@@ -68,12 +68,17 @@ class SubResourceAdmin(ModelAdmin):
     search_fields = ('name', 'description', 'resource__name')
 
 class ApplicationResourcePermissionForm(forms.ModelForm):
+    permission = forms.MultipleChoiceField(
+        choices=ApplicationResourcePermission.PERMISSION_CHOICES,
+        widget=forms.CheckboxSelectMultiple,
+        required=False,
+    )
     class Meta:
         model = ApplicationResourcePermission
         fields = '__all__'
-        widgets = {
-            'permission': forms.CheckboxSelectMultiple
-        }
+        # widgets = {
+        #     'permission': forms.CheckboxSelectMultiple
+        # }
 
 @admin.register(ApplicationResourcePermission)
 class ApplicationResourcePermissionAdmin(ModelAdmin):

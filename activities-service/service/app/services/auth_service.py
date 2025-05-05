@@ -1,4 +1,4 @@
-from fastapi import Request, HTTPException, Depends
+from fastapi import Header, Request, HTTPException, Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 import httpx
 import os
@@ -6,9 +6,11 @@ from starlette.status import HTTP_403_FORBIDDEN, HTTP_401_UNAUTHORIZED
 
 from app.models.dto.models import AuthenticatedUserDTO
 
-AUTH_SERVER_URL = os.getenv("AUTH_SERVER_URL")
+AUTH_SERVICE_URL = os.getenv("AUTH_SERVICE_URL")
 
 bearer_scheme = HTTPBearer()
+
+RESOURCE_NAME = "activities-services"
 
 
 async def check_user_permission(
@@ -21,7 +23,7 @@ async def check_user_permission(
         "x-sub-resource": sub_resource,
     }
 
-    url = f"{AUTH_SERVER_URL}/api/auth/user/check-user-permission/"
+    url = f"{AUTH_SERVICE_URL}/api/auth/user/check-user-permission/"
 
     try:
         async with httpx.AsyncClient(timeout=3.0) as client:
@@ -53,7 +55,7 @@ async def check_user_permission(
 async def check_application_permission(api_key: str, resource: str):
     headers = {"x-api-key": api_key, "x-resource": resource}
 
-    url = f"{AUTH_SERVER_URL}/api/auth/application/check_application_permission/"
+    url = f"{AUTH_SERVICE_URL}/api/auth/application/check_application_permission/"
 
     try:
         async with httpx.AsyncClient(timeout=3.0) as client:
@@ -84,35 +86,79 @@ async def check_application_permission(api_key: str, resource: str):
         )
 
 
-async def authenticate_request(request: Request):
-    api_key = request.headers.get("x-api-key")
-    user_token = extract_user_token(request)
-    resource = request.headers.get("x-resource")
-    sub_resource = request.headers.get("x-sub-resource")
+def get_auth_headers(resource: str, sub_resource: str, method: str):
+    def dependency():
+        return {
+            "X-RESOURCE": resource,
+            "X-SUB-RESOURCE": sub_resource,
+            "X-METHOD": method,
+        }
 
-    app_auth = None
-    user_auth = None
+    return dependency
 
-    if api_key and resource:
-        try:
-            app_auth = await check_application_permission(api_key, resource)
-        except HTTPException:
-            if not user_token:
-                raise
 
-    if user_token and resource and sub_resource:
-        try:
-            user_auth = await check_user_permission(
-                user_token, api_key, resource, sub_resource
-            )
-        except HTTPException:
-            if not app_auth:
-                raise
+def authenticate_request(_resource: str, _sub_resource: str, _method: str):
+    async def dependency(
+        request: Request, override_value: dict = Depends(authentication_override)
+    ):
+        if override_value is not None:
+            return override_value
 
-    if not app_auth and not user_auth:
-        raise HTTPException(status_code=401, detail="Authentication failed")
+        api_key = request.headers.get("x-api-key")
+        user_token = extract_user_token(request)
+        resource = _resource
+        sub_resource = _sub_resource
 
-    return {"app": app_auth, "user": user_auth}
+        print(f"API Key: {api_key}")
+        print(f"User Token: {user_token}")
+        print(f"Resource: {resource}")
+        print(f"Sub Resource: {sub_resource}")
+
+        app_auth = None
+        user_auth = None
+
+        if api_key and resource:
+            try:
+                app_auth = await check_application_permission(api_key, resource)
+            except HTTPException:
+                if not user_token:
+                    raise
+
+        if user_token and resource and sub_resource:
+            try:
+                user_auth = await check_user_permission(
+                    user_token, api_key, resource, sub_resource
+                )
+            except HTTPException:
+                if not app_auth:
+                    raise
+
+        if not app_auth and not user_auth:
+            raise HTTPException(status_code=401, detail="Authentication failed")
+
+        return {"app": app_auth, "user": user_auth}
+
+    return dependency
+
+
+def authenticate_request_with_user(_resource: str, _sub_resource: str, _method: str):
+    async def dependency(
+        auth_data: dict = Depends(
+            authenticate_request(_resource, _sub_resource, _method)
+        ),
+    ):
+        if not auth_data.get("user") or not auth_data.get("user").get("user"):
+            raise HTTPException(status_code=401, detail="User authentication required")
+
+        if not auth_data["user"].get("status") == "authorised":
+            raise HTTPException(status_code=401, detail="User authentication required")
+
+        if not auth_data["user"]["user"]["id"] or auth_data["user"]["user"]["id"] == 0:
+            raise HTTPException(status_code=401, detail="User authentication required")
+
+        return auth_data
+
+    return dependency
 
 
 def extract_user_token(request: Request):
@@ -132,7 +178,7 @@ async def authenticate_user(
     try:
         async with httpx.AsyncClient() as client:
             response = await client.get(
-                f"{AUTH_SERVER_URL}/api/auth/user/info",
+                f"{AUTH_SERVICE_URL}/api/auth/user/info",
                 headers={"Authorization": f"Bearer {token}"},
                 timeout=10.0,
             )
@@ -149,3 +195,7 @@ async def authenticate_user(
         )
     except httpx.RequestError as e:
         raise HTTPException(status_code=500, detail="Auth server unreachable")
+
+
+def authentication_override():
+    return None

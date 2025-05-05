@@ -1,6 +1,7 @@
 from geoalchemy2 import Geometry
 from sqlalchemy import (
     TIMESTAMP,
+    BigInteger,
     Column,
     Float,
     ForeignKey,
@@ -22,8 +23,8 @@ class Activity(Base):
     address = Column(String(255), index=False)
     created_at = Column(TIMESTAMP, index=False)
     updated_at = Column(TIMESTAMP, index=False)
-    created_by = Column(UUID, index=True)
-    updated_by = Column(UUID, index=True)
+    created_by = Column(BigInteger, index=True)
+    updated_by = Column(BigInteger, index=True)
 
     booking_url = Column(String(255), index=False)
     hero_image_id = Column(
@@ -65,7 +66,7 @@ class ActivityReview(Base):
     activity_id = Column(
         Integer, ForeignKey("activities.id", ondelete="CASCADE"), nullable=False
     )
-    user_id = Column(UUID, index=True)
+    user_id = Column(BigInteger, index=True)
     rating = Column(Integer, index=False)
     review_text = Column(String(512), index=False)
     activity = relationship("Activity", back_populates="reviews")

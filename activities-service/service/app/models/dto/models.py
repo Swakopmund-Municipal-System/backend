@@ -49,13 +49,11 @@ class CreateReviewDTO(BaseModel):
     activity_id: int = Field(..., example=1)
     rating: int = Field(..., example=5, ge=1, le=5)
     review: str = Field(..., example="Great experience!", min_length=3, max_length=512)
-    user_id: str = Field(..., example="123e4567-e89b-12d3-a456-426614174000")
 
 
 class ActivityReviewSearchResultDTO(BaseModel):
     id: int = Field(..., example=1)
     activity_id: int = Field(..., example=1)
-    user_id: str = Field(..., example="123e4567-e89b-12d3-a456-426614174000")
     rating: int = Field(..., example=5, ge=1, le=5)
     review_text: str = Field(
         ..., example="Great experience!", min_length=3, max_length=512

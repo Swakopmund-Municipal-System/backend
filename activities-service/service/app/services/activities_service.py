@@ -1,3 +1,4 @@
+import datetime
 from typing import List, Optional
 import uuid
 
@@ -150,7 +151,9 @@ def get_activity_by_id(
         return None, 500, str(e)
 
 
-def create_activity(db: Session, data: ActivityCreateDTO) -> tuple[int, int, str]:
+def create_activity(
+    db: Session, data: ActivityCreateDTO, user_id: int
+) -> tuple[int, int, str]:
     try:
         hero_image_data = None
         if data.hero_image != None:
@@ -167,14 +170,17 @@ def create_activity(db: Session, data: ActivityCreateDTO) -> tuple[int, int, str
 
         activity_data = Activity(
             name=data.name,
+            type=data.type,
             description=data.description,
             address=data.address,
-            created_by=uuid.uuid4(),
-            updated_by=uuid.uuid4(),
+            created_by=user_id,
+            updated_by=user_id,
             booking_url=data.booking_url,
             hero_image_id=hero_image_data.id if hero_image_data else None,
             latitude=data.latitude,
             longitude=data.longitude,
+            created_at=datetime.datetime.now(datetime.timezone.utc),
+            updated_at=datetime.datetime.now(datetime.timezone.utc),
             point_geom=f"SRID=4326;POINT({data.longitude} {data.latitude})",
         )
         db.add(activity_data)
@@ -208,7 +214,9 @@ def create_activity(db: Session, data: ActivityCreateDTO) -> tuple[int, int, str
         return None, 500, str(e)
 
 
-def edit_activity(db: Session, data: ActivityEditDTO) -> tuple[bool, int, str]:
+def edit_activity(
+    db: Session, data: ActivityEditDTO, user_id: int
+) -> tuple[bool, int, str]:
     try:
         activity_data = db.query(Activity).filter(Activity.id == data.id).first()
         if not activity_data:
@@ -220,6 +228,8 @@ def edit_activity(db: Session, data: ActivityEditDTO) -> tuple[bool, int, str]:
         activity_data.booking_url = data.booking_url
         activity_data.latitude = data.latitude
         activity_data.longitude = data.longitude
+        activity_data.updated_by = user_id
+        activity_data.updated_at = datetime.datetime.now(datetime.timezone.utc)
 
         db.commit()
 

@@ -70,7 +70,10 @@ def create_initial_user_permissions(apps, schema_editor):
         'resident': {
             'events': ['read'],
             'comments': ['read', 'write'],
-            'activities': ['read'],
+            'fetch-activities': ['read'],
+            'modify-activities': ['read'],
+            'review-activities': ['read', 'write'],
+            'modify-activity-reviews': ['read', 'write'],
             'fetch-places': ['read'],
             'review-places': ['read', 'write'],
             'fetch-accommodation': ['read'],
@@ -98,7 +101,9 @@ def create_initial_user_permissions(apps, schema_editor):
         },
         'tourist': {
             'events': ['read'],
-            'activities': ['read'],
+            'fetch-activities': ['read'],
+            'modify-activities': ['read'],
+            'review-activities': ['read', 'write'],
             'fetch-places': ['read'],
             'fetch-accommodation': ['read'],
             'fetch-restaurants': ['read'],
@@ -207,6 +212,12 @@ def create_initial_user_permissions(apps, schema_editor):
             'review-accommodation': ['read', 'write', 'admin'],
             'auth': ['read', 'write'],
         },
+        'activities-provider': {
+            'fetch-activities': ['read'],
+            'modify-activities': ['read', 'write', 'admin'],
+            'review-activities': ['read', 'write', 'admin'],
+            'auth': ['read', 'write'],
+        }
     }
 
     # Create the permissions
@@ -248,12 +259,29 @@ def create_activities_services(Resource, SubResource):
 
     SubResource.objects.get_or_create(
         resource=activities_resources,
-        name='activities',
+        name='fetch-activities',
         defaults={
-            'description': 'Activities sub resource services',
+            'description': 'Activities fetching sub resource services',
             'allow_anonymous': True
         }
     )
+    SubResource.objects.get_or_create(
+        resource=activities_resources,
+        name='modify-activities',
+        defaults={
+            'description': 'Activities modifying sub resource services',
+            'allow_anonymous': False
+        }
+    )
+    SubResource.objects.get_or_create(
+        resource=activities_resources,
+        name='review-activities',
+        defaults={
+            'description': 'Activities reviewing sub resource services',
+            'allow_anonymous': False
+        }
+    )
+
 
 def create_places_services(Resource, SubResource):
     places_resources, _ = Resource.objects.get_or_create(

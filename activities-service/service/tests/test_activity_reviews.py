@@ -68,7 +68,6 @@ def test_create_review___success(client):
         activity_id=1,
         review="This is a test review",
         rating=5,
-        user_id="123e4567-e89b-12d3-a456-426614174000",
     )
     response = client.post("/reviews", json=payload.model_dump())
     assert response.status_code == 201
@@ -79,7 +78,6 @@ def test_create_review___failure_empty_review(client):
         activity_id=1,
         review="abcd",
         rating=2,
-        user_id="123e4567-e89b-12d3-a456-426614174000",
     )
     payload.review = ""
     response = client.post("/reviews", json=payload.model_dump())
@@ -91,7 +89,6 @@ def test_create_review___failure_invalid_rating(client):
         activity_id=1,
         review="This is a test review",
         rating=5,
-        user_id="123e4567-e89b-12d3-a456-426614174000",
     )
     payload.rating = 6
     response = client.post("/reviews", json=payload.model_dump())
@@ -103,9 +100,8 @@ def test_create_review___failure_missing_fields(client):
         activity_id=1,
         review="This is a test review",
         rating=5,
-        user_id="123e4567-e89b-12d3-a456-426614174000",
     )
-    payload.user_id = None
+    payload.review = None
     response = client.post("/reviews", json=payload.model_dump())
     assert response.status_code == 422
 
@@ -115,7 +111,6 @@ def test_create_review___failure_invalid_activity_id(client):
         activity_id=9999,
         review="This is a test review",
         rating=5,
-        user_id="123e4567-e89b-12d3-a456-426614174000",
     )
     response = client.post("/reviews", json=payload.model_dump())
     assert response.status_code == 404

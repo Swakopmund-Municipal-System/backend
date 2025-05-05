@@ -12,7 +12,11 @@ from app.services.activity_images_service import (
     get_image_ids_for_activity,
     set_hero_image_for_activity,
 )
-from app.services.auth_service import authenticate_user
+from app.services.auth_service import (
+    RESOURCE_NAME,
+    authenticate_request,
+    authenticate_user,
+)
 
 ALLOWED_MIME_TYPES = ["image/png", "image/jpeg"]
 
@@ -54,6 +58,9 @@ def upload_hero_image(
     activity_id: int,
     image: UploadFile = File(...),
     db: Session = Depends(get_db),
+    auth_data: dict = Depends(
+        authenticate_request(RESOURCE_NAME, "modify-activities", "set-hero-image")
+    ),
 ):
     if image.content_type not in ALLOWED_MIME_TYPES:
         raise HTTPException(
@@ -85,6 +92,9 @@ def upload_activity_images(
     activity_id: int,
     images: list[UploadFile] = File(...),
     db: Session = Depends(get_db),
+    auth_data: dict = Depends(
+        authenticate_request(RESOURCE_NAME, "modify-activities", "add-images")
+    ),
 ):
     for image in images:
         if image.content_type not in ALLOWED_MIME_TYPES:
@@ -116,6 +126,9 @@ def upload_activity_images(
 def get_activity_images(
     activity_id: int,
     db: Session = Depends(get_db),
+    auth_data: dict = Depends(
+        authenticate_request(RESOURCE_NAME, "fetch-activities", "get-activity-images")
+    ),
 ):
     (image_ids, status_code, err_message) = get_image_ids_for_activity(db, activity_id)
     if not image_ids:
@@ -128,7 +141,7 @@ def get_activity_images(
 
 
 @router.delete(
-    "/{activity_id}",
+    "/{image_id}",
     responses={
         200: {"description": "image deleted successfully."},
         404: {"description": "activity not found."},
@@ -136,10 +149,13 @@ def get_activity_images(
     },
 )
 def delete_activity_images(
-    activity_id: int,
+    image_id: int,
     db: Session = Depends(get_db),
+    auth_data: dict = Depends(
+        authenticate_request(RESOURCE_NAME, "modify-activities", "delete-images")
+    ),
 ):
-    (success, status_code, err_message) = delete_image_by_id(db, activity_id)
+    (success, status_code, err_message) = delete_image_by_id(db, image_id)
     if not success:
         raise HTTPException(status_code=status_code, detail=err_message)
 
