@@ -1,5 +1,5 @@
 import os
-from fastapi import FastAPI, HTTPException, Depends
+from fastapi import FastAPI, HTTPException, Depends, Header
 from pydantic import BaseModel
 from typing import List, Optional
 from datetime import datetime
@@ -8,20 +8,20 @@ from sqlalchemy import select
 from dotenv import load_dotenv
 from models import Base, RestaurantDB, ReviewDB
 from sqlalchemy.orm import selectinload
+import httpx
 
-# env_path = os.path.join(os.path.dirname(__file__), '.env')
-# load_dotenv(dotenv_path=env_path, override=True)
+# Load environment variables
 load_dotenv()
 
+# Configuration
 DATABASE_URL = os.getenv("DATABASE_URL")
-# engine = create_async_engine(DATABASE_URL, echo=True)
-# async_session = async_sessionmaker(engine, expire_on_commit=False)
+AUTH_SERVICE_URL = os.getenv("AUTH_SERVICE_URL")
+PORT = int(os.getenv("PORT", "8002"))
+HOST = os.getenv("HOST", "0.0.0.0")
+
+# Database setup
 engine = create_async_engine(DATABASE_URL, echo=True)
 async_session = async_sessionmaker(engine, expire_on_commit=False)
-# SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
-# Base = declarative_base()
-
 
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -85,13 +85,50 @@ async def get_db():
     async with async_session() as session:
         yield session
 
+# Authentication middleware
+async def verify_auth(
+    x_api_key: str = Header(None),
+    x_resource: str = Header(None),
+    x_sub_resource: str = Header(None),
+    authorization: str = Header(None)
+):
+    if not x_api_key or not x_resource:
+        raise HTTPException(status_code=401, detail="Missing required headers")
+    
+    # For anonymous endpoints, we only need to verify the API key
+    if x_sub_resource == "fetch-restaurants":
+        return True
+        
+    # For authenticated endpoints, we need both API key and user token
+    if not authorization:
+        raise HTTPException(status_code=401, detail="Missing authorization token")
+        
+    # Verify with auth service
+    async with httpx.AsyncClient() as client:
+        try:
+            response = await client.post(
+                f"{AUTH_SERVICE_URL}/api/auth/verify",
+                headers={
+                    "x-api-key": x_api_key,
+                    "x-resource": x_resource,
+                    "x-sub-resource": x_sub_resource,
+                    "authorization": authorization
+                }
+            )
+            if response.status_code != 200:
+                raise HTTPException(status_code=401, detail="Invalid authentication")
+            return True
+        except Exception as e:
+            raise HTTPException(status_code=401, detail=str(e))
+
 @app.get("/", response_model=List[Restaurant])
 async def get_restaurants(
     name: Optional[str] = None,
     cuisine: Optional[str] = None,
     price_range: Optional[str] = None,
     is_featured: Optional[bool] = None,
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
+    _: bool = Depends(verify_auth)
 ):
     query = select(RestaurantDB).options(selectinload(RestaurantDB.reviews))
     if name:
@@ -174,7 +211,12 @@ async def get_restaurant_details(restaurant_id: int, db: AsyncSession = Depends(
     return restaurant
 
 @app.post("/{restaurant_id}/reviews", status_code=200)
-async def add_review(restaurant_id: int, review: Review, db: AsyncSession = Depends(get_db)):
+async def add_review(
+    restaurant_id: int,
+    review: Review,
+    db: AsyncSession = Depends(get_db),
+    _: bool = Depends(verify_auth)
+):
     # Check restaurant exists
     result = await db.execute(select(RestaurantDB).where(RestaurantDB.id == restaurant_id).options(selectinload(RestaurantDB.reviews)))
     restaurant = result.scalar_one_or_none()
@@ -198,4 +240,4 @@ async def add_review(restaurant_id: int, review: Review, db: AsyncSession = Depe
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8002) 
+    uvicorn.run(app, host=HOST, port=PORT) 
