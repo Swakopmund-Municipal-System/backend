@@ -78,16 +78,16 @@
 - `DELETE /activities/{id}` - delete activity by id
 
 ### Activity Images
-- `GET /images/{id}` - get image by id
-- `GET /images/activity/{id}` - get activity images by activity id
-- `POST /activity/{activity_id}/hero/upload` - upload hero image for activity
-- `POST /activity/{activity_id}/upload` - upload image for activity
-- `DELETE /images/{id}` - delete image by id
+- `GET /activities/images/{id}` - get image by id
+- `GET /activities/images/activity/{id}` - get activity images by activity id
+- `POST /activities/images/activity/{activity_id}/hero/upload` - upload hero image for activity
+- `POST /activities/images/activity/{activity_id}/upload` - upload image for activity
+- `DELETE /activities/images/{id}` - delete image by id
 
 ### Reviews
-- `GET /reviews` - search reviews
-- `POST /reviews` - create review
-- `DELETE /reviews/{id}` - delete review by id
+- `GET /activities/reviews` - search reviews
+- `POST /activities/reviews` - create review
+- `DELETE /activities/reviews/{id}` - delete review by id
 
 ## Swagger UI
 
@@ -102,7 +102,7 @@
 
 ## Generate clients
 
-The open api spec can be used to generate clients for use in other applications. For example, to generate a TS client, use the following command:
+The open api spec can be used to generate clients for use in other applications. For example, to generate a TS client, use the following commands:
 ```bash
 npm install -g nswag
 

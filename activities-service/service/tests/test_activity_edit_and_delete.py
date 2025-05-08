@@ -3,6 +3,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from app.models.dto.models import ActivityEditDTO
+from tests.conftest import BASE_TEST_URL
 
 
 def test_edit_activity_success(client):
@@ -18,7 +19,7 @@ def test_edit_activity_success(client):
     )
 
     response = client.post(
-        "/activities/edit",
+        f"{BASE_TEST_URL}/edit",
         data=data.model_dump_json(),
     )
 
@@ -38,7 +39,7 @@ def test_edit_activity_invalid_id(client):
     )
 
     response = client.post(
-        "/activities/edit",
+        f"{BASE_TEST_URL}/edit",
         data=data.model_dump_json(),
     )
 
@@ -60,7 +61,7 @@ def test_edit_activity_missing_required_field(client):
     data.name = None
 
     response = client.post(
-        "/activities/edit",
+        f"{BASE_TEST_URL}/edit",
         data=data.model_dump(),
     )
 
@@ -82,7 +83,7 @@ def test_edit_activity_invalid_lat_long(client):
     data.longitude = "not-a-float"
 
     response = client.post(
-        "/activities/edit",
+        f"{BASE_TEST_URL}/edit",
         data=data.model_dump(),
     )
 
@@ -90,18 +91,18 @@ def test_edit_activity_invalid_lat_long(client):
 
 
 def test_delete_activity_success(client):
-    response = client.delete("/activities/1")
+    response = client.delete(f"{BASE_TEST_URL}/1")
 
     assert response.status_code == 200
 
 
 def test_delete_activity_not_found(client):
-    response = client.delete("/activities/9999999")
+    response = client.delete(f"{BASE_TEST_URL}/9999999")
 
     assert response.status_code == 404
 
 
 def test_delete_activity_invalid_id(client):
-    response = client.delete("/activities/invalid_id")
+    response = client.delete(f"{BASE_TEST_URL}/invalid_id")
 
     assert response.status_code == 422

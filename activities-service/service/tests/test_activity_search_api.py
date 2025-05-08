@@ -3,11 +3,12 @@ import pytest
 from fastapi.testclient import TestClient
 
 from app.models.enums.enums import ActivityType
+from tests.conftest import BASE_TEST_URL
 
 
 def test_get_activities___success_no_filters(client):
     response = client.get(
-        "/activities/search",
+        f"{BASE_TEST_URL}/search",
         params={
             "search_term": "",
             "sort_field": "",
@@ -25,7 +26,7 @@ def test_get_activities___success_no_filters(client):
 
 def test_get_activities___success_with_search_term_filter(client):
     response = client.get(
-        "/activities/search",
+        f"{BASE_TEST_URL}/search",
         params={
             "search_term": "Description for Festival 1",
             "sort_field": "",
@@ -44,7 +45,7 @@ def test_get_activities___success_with_search_term_filter(client):
 
 def test_get_activities___success_with_sorting(client):
     response = client.get(
-        "/activities/search",
+        f"{BASE_TEST_URL}/search",
         params={
             "search_term": "",
             "sort_field": "created_at",
@@ -63,7 +64,7 @@ def test_get_activities___success_with_sorting(client):
 
 def test_get_activities___success_category_festival(client):
     response = client.get(
-        "/activities/search",
+        f"{BASE_TEST_URL}/search",
         params={
             "search_term": "",
             "sort_field": "",
@@ -83,7 +84,7 @@ def test_get_activities___success_category_festival(client):
 
 def test_get_activities___success_category_recreational_and_festival(client):
     response = client.get(
-        "/activities/search",
+        f"{BASE_TEST_URL}/search",
         params={
             "search_term": "",
             "sort_field": "",
@@ -106,7 +107,7 @@ def test_get_activities___success_category_recreational_and_festival(client):
 
 def test_get_activities___success_no_item_with_category(client):
     response = client.get(
-        "/activities/search",
+        f"{BASE_TEST_URL}/search",
         params={
             "search_term": "",
             "sort_field": "",
@@ -125,7 +126,7 @@ def test_get_activities___success_no_item_with_category(client):
 
 def test_get_activities_by_location___success(client):
     response = client.get(
-        "/activities/search/location",
+        f"{BASE_TEST_URL}/search/location",
         params={
             "latitude": -22.592063343286743,
             "longitude": 17.080047073592386,
@@ -144,7 +145,7 @@ def test_get_activities_by_location___success(client):
 
 def test_get_activities_by_location___success_with_search_term(client):
     response = client.get(
-        "/activities/search/location",
+        f"{BASE_TEST_URL}/search/location",
         params={
             "latitude": -22.592063343286743,
             "longitude": 17.080047073592386,
@@ -163,7 +164,7 @@ def test_get_activities_by_location___success_with_search_term(client):
 
 def test_get_activities_by_location___success_with_category(client):
     response = client.get(
-        "/activities/search/location",
+        f"{BASE_TEST_URL}/search/location",
         params={
             "latitude": -22.592063343286743,
             "longitude": 17.080047073592386,
@@ -182,7 +183,7 @@ def test_get_activities_by_location___success_with_category(client):
 
 def test_get_activities_by_location___success_larger_radius(client):
     response = client.get(
-        "/activities/search/location",
+        f"{BASE_TEST_URL}/search/location",
         params={
             "latitude": -22.592063343286743,
             "longitude": 17.080047073592386,
@@ -200,7 +201,7 @@ def test_get_activities_by_location___success_larger_radius(client):
 
 def test_get_activities_by_location___success_no_items(client):
     response = client.get(
-        "/activities/search/location",
+        f"{BASE_TEST_URL}/search/location",
         params={
             "latitude": -21.592063343286743,
             "longitude": 17.080047073592386,
@@ -217,7 +218,7 @@ def test_get_activities_by_location___success_no_items(client):
 
 
 def test_get_actitity_by_id___success(client):
-    response = client.get("/activities/1")
+    response = client.get(f"{BASE_TEST_URL}/1")
     assert response.status_code == 200
     raw_data = response.json()
     data = json.loads(raw_data)
@@ -227,10 +228,10 @@ def test_get_actitity_by_id___success(client):
 
 
 def test_get_activity_by_id___not_found(client):
-    response = client.get("/activities/9999")
+    response = client.get(f"{BASE_TEST_URL}/9999")
     assert response.status_code == 404
 
 
 def test_get_activity_by_id___invalid_id(client):
-    response = client.get("/activities/invalid_id")
+    response = client.get(f"{BASE_TEST_URL}/invalid_id")
     assert response.status_code == 422

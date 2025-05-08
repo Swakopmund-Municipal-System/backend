@@ -23,6 +23,7 @@ from app.services.auth_service import (
 
 
 TEST_DATABASE_URL_WITHOUT_DB_NAME = os.getenv("TEST_DATABASE_URL_WITHOUT_DB_NAME")
+BASE_TEST_URL = "/api/activities"
 
 
 @pytest.fixture(scope="function")

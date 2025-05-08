@@ -22,9 +22,13 @@ app = FastAPI(
     openapi_tags=[],
 )
 
-app.include_router(activity_routes.router, prefix="/activities", tags=[])
-app.include_router(activity_image_routes.router, prefix="/images", tags=[])
-app.include_router(activity_review_routes.router, prefix="/reviews", tags=[])
+app.include_router(activity_routes.router, prefix="/api/activities", tags=[])
+app.include_router(
+    activity_image_routes.router, prefix="/api/activities/images", tags=[]
+)
+app.include_router(
+    activity_review_routes.router, prefix="/api/activities/reviews", tags=[]
+)
 
 
 def custom_openapi():
