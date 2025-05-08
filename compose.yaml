@@ -111,6 +111,7 @@ services:
     environment:
       AUTH_SERVICE_URL: ${AUTH_SERVER_URL}
       DATABASE_URL: ${ACTIVITIES_DB_URL}
+    restart: always
 
   auth_database:
     image: postgres:latest
