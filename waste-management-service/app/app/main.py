@@ -10,6 +10,7 @@ from app.models.dto.models import (
     MissedWastePickupSearchResultDto,
     UpdateMissedWastePickupStatusDto,
 )
+from app.services.auth_service import RESOURCE_NAME, authenticate_request_with_user
 
 Base.metadata.create_all(bind=get_engine())
 
@@ -38,9 +39,15 @@ def get_db():
     },
 )
 def create_missed_waste_pickup(
-    data: CreateMissedWastePickupDto, db: Session = Depends(get_db)
+    data: CreateMissedWastePickupDto,
+    db: Session = Depends(get_db),
+    auth_data: dict = Depends(
+        authenticate_request_with_user(RESOURCE_NAME, "missed-waste-pickups", "create")
+    ),
 ):
-    (record, status_code, err_message) = crud.create_missed_waste_pickup(db, data=data)
+    (record, status_code, err_message) = crud.create_missed_waste_pickup(
+        db, data, auth_data["user"]["user"]["id"]
+    )
     if status_code != 201:
         raise HTTPException(status_code=status_code, detail=err_message)
 
@@ -62,6 +69,9 @@ def get_missed_waste_pickups(
     limit: int = 10,
     page: int = 1,
     db: Session = Depends(get_db),
+    auth_data: dict = Depends(
+        authenticate_request_with_user(RESOURCE_NAME, "missed-waste-pickups", "search")
+    ),
 ):
     results = crud.search_missed_waste_pickups(
         db=db,
@@ -86,6 +96,11 @@ def get_missed_waste_pickups(
 def get_missed_waste_pickup_details(
     id: int,
     db: Session = Depends(get_db),
+    auth_data: dict = Depends(
+        authenticate_request_with_user(
+            RESOURCE_NAME, "missed-waste-pickups", "get_details"
+        )
+    ),
 ):
     if not id:
         raise HTTPException(
@@ -115,10 +130,16 @@ def get_missed_waste_pickup_details(
     },
 )
 def update_missed_waste_pickup_status(
-    data: UpdateMissedWastePickupStatusDto, db: Session = Depends(get_db)
+    data: UpdateMissedWastePickupStatusDto,
+    db: Session = Depends(get_db),
+    auth_data: dict = Depends(
+        authenticate_request_with_user(
+            RESOURCE_NAME, "missed-waste-pickups", "update_status"
+        )
+    ),
 ):
     (success, status_code, err_message) = crud.update_missed_waste_pickup_status(
-        db, data=data
+        db, data
     )
     if status_code != 200:
         raise HTTPException(status_code=status_code, detail=err_message)

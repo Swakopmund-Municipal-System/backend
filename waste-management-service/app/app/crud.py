@@ -14,17 +14,16 @@ from app.models.enums.enums import MissedWastePickupStatusEnum
 
 
 def create_missed_waste_pickup(
-    db: Session, data: CreateMissedWastePickupDto
+    db: Session, data: CreateMissedWastePickupDto, userId: int
 ) -> tuple[MissedWastePickups, int, str]:
     try:
-        if not data.description or not data.date or not data.address or not data.userId:
+        if not data.description or not data.date or not data.address:
             return None, 400, "Invalid input data"
 
         if (
             not data.description.strip()
             or not data.date.strip()
             or not data.address.strip()
-            or not data.userId.strip()
         ):
             return None, 400, "Invalid input data"
 
@@ -41,7 +40,7 @@ def create_missed_waste_pickup(
             date=date_as_datetime,
             address=data.address,
             status=MissedWastePickupStatusEnum.PENDING_REVIEW,
-            userId=uuid.UUID(data.userId),
+            userId=userId,
         )
 
         db.add(missed_waste_pickup)

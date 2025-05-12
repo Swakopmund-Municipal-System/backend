@@ -12,7 +12,6 @@ def test_create_missed_waste_pickup___success(client):
         description="Test missed waste pickup",
         date="2023-10-01 12:00:00",
         address="123 Test St",
-        userId="123e4567-e89b-12d3-a456-426614174000",
     )
     response = client.post("/missed_waste_pickups/", json=payload.model_dump())
     assert response.status_code == 201
@@ -23,7 +22,6 @@ def test_create_missed_waste_pickup___failure_invalid_data(client):
         description="",  # Invalid description
         date="2023-10-01 12:00:00",
         address="123 Test St",
-        userId="123e4567-e89b-12d3-a456-426614174000",
     )
     response = client.post("/missed_waste_pickups/", json=payload.model_dump())
     assert response.status_code == 400

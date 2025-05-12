@@ -98,6 +98,7 @@ def create_initial_user_permissions(apps, schema_editor):
             'fetch-recycling': ['read'],
             'bin': ['read', 'write'],
             'auth': ['read', 'write'],
+            'missed-waste-pickups': ['write'],
         },
         'tourist': {
             'events': ['read'],
@@ -131,31 +132,37 @@ def create_initial_user_permissions(apps, schema_editor):
             'property': ['read'],
             'property-admin': ['read', 'write', 'admin'],
             'auth': ['read', 'write'],
+            'missed-waste-pickups': ['write'],
         },
         'building-inspector': {
             'property': ['read'],
             'property-admin': ['read', 'write', 'admin'],
             'auth': ['read', 'write'],
+            'missed-waste-pickups': ['write'],
         },
         'environmental-officer': {
             'environment-health': ['read', 'write', 'admin'],
             'complaint-health': ['read', 'write', 'admin'],
             'auth': ['read', 'write'],
+            'missed-waste-pickups': ['write'],
         },
         'funeral-home': {
             'fetch-cemetery-health': ['read'],
             'modify-cemetery-health': ['read', 'write'],
             'auth': ['read', 'write'],
+            'missed-waste-pickups': ['write'],
         },
         'event-organizer': {
             'events': ['read', 'write'],
             'modify-events': ['read', 'write'],
             'auth': ['read', 'write'],
+            'missed-waste-pickups': ['write'],
         },
         'library-staff': {
             'books': ['read', 'write', 'admin'],
             'borrow': ['read', 'write', 'admin'],
             'auth': ['read', 'write'],
+            'missed-waste-pickups': ['write'],
         },
         'business-support': {
             'register-business': ['read', 'write', 'admin'],
@@ -164,16 +171,19 @@ def create_initial_user_permissions(apps, schema_editor):
             'modify-events': ['read', 'write', 'admin'],
             'fetch-events': ['read'],
             'auth': ['read', 'write'],
+            'missed-waste-pickups': ['write'],
         },
         'fire-department': {
             'report-incident': ['read', 'write', 'admin'],
             'status-incident': ['read', 'write', 'admin'],
             'auth': ['read', 'write'],
+            'missed-waste-pickups': ['write'],
         },
         'law-enforcement': {
             'report-incident': ['read', 'write', 'admin'],
             'status-incident': ['read', 'write', 'admin'],
             'auth': ['read', 'write'],
+            'missed-waste-pickups': ['write'],
         },
         'waste-management': {
             'fetch-schedule': ['read'],
@@ -183,6 +193,7 @@ def create_initial_user_permissions(apps, schema_editor):
             'modify-recycling': ['read', 'write', 'admin'],
             'bin': ['read', 'write', 'admin'],
             'auth': ['read', 'write'],
+            'missed-waste-pickups': ['write','read','admin'],
         },
         'health-services': {
             'environment-health': ['read', 'write', 'admin'],
@@ -190,33 +201,39 @@ def create_initial_user_permissions(apps, schema_editor):
             'fetch-cemetery-health': ['read'],
             'complaint-health': ['read', 'write', 'admin'],
             'auth': ['read', 'write'],
+            'missed-waste-pickups': ['write'],
         },
         'community-services': {
             'books': ['read', 'write', 'admin'],
             'borrow': ['read', 'write', 'admin'],
             'auth': ['read', 'write'],
+            'missed-waste-pickups': ['write'],
         },
 
         # Business owners
         'business-owner': {
             'register-business': ['read', 'write'],
             'auth': ['read', 'write'],
+            'missed-waste-pickups': ['write'],
         },
         'restaurant-owner': {
             'fetch-restaurants': ['read'],
             'review-restaurants': ['read', 'write', 'admin'],
             'auth': ['read', 'write'],
+            'missed-waste-pickups': ['write'],
         },
         'accommodation-provider': {
             'fetch-accommodation': ['read'],
             'review-accommodation': ['read', 'write', 'admin'],
             'auth': ['read', 'write'],
+            'missed-waste-pickups': ['write'],
         },
         'activities-provider': {
             'fetch-activities': ['read'],
             'modify-activities': ['read', 'write', 'admin'],
             'review-activities': ['read', 'write', 'admin'],
             'auth': ['read', 'write'],
+            'missed-waste-pickups': ['write'],
         }
     }
 
@@ -625,6 +642,15 @@ def create_waste_services(Resource, SubResource):
         defaults={
             'description': 'Bin sub resource services',
             'allow_anonymous': True
+        }
+    )
+
+    SubResource.objects.get_or_create(
+        resource=waste_resources,
+        name='missed-waste-pickups',
+        defaults={
+            'description': 'Manage missed waste pickups sub resource services',
+            'allow_anonymous': False
         }
     )
 
