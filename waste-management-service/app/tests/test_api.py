@@ -13,7 +13,9 @@ def test_create_missed_waste_pickup___success(client):
         date="2023-10-01 12:00:00",
         address="123 Test St",
     )
-    response = client.post("/missed_waste_pickups/", json=payload.model_dump())
+    response = client.post(
+        "/api/waste-management/missed_waste_pickups/", json=payload.model_dump()
+    )
     assert response.status_code == 201
 
 
@@ -23,13 +25,15 @@ def test_create_missed_waste_pickup___failure_invalid_data(client):
         date="2023-10-01 12:00:00",
         address="123 Test St",
     )
-    response = client.post("/missed_waste_pickups/", json=payload.model_dump())
+    response = client.post(
+        "/api/waste-management/missed_waste_pickups/", json=payload.model_dump()
+    )
     assert response.status_code == 400
 
 
 def test_get_missed_waste_pickups___success_no_filters(client):
     response = client.get(
-        "/missed_waste_pickups",
+        "/api/waste-management/missed_waste_pickups",
         params={
             "search_term": "",
             "sort_field": "",
@@ -47,7 +51,7 @@ def test_get_missed_waste_pickups___success_no_filters(client):
 
 def test_get_missed_waste_pickups___success_with_search_term_filter(client):
     response = client.get(
-        "/missed_waste_pickups",
+        "/api/waste-management/missed_waste_pickups",
         params={
             "search_term": "missed waste pickup 1 -- PENDING",
             "sort_field": "",
@@ -66,7 +70,7 @@ def test_get_missed_waste_pickups___success_with_search_term_filter(client):
 
 def test_get_missed_waste_pickups___success_with_sorting(client):
     response = client.get(
-        "/missed_waste_pickups",
+        "/api/waste-management/missed_waste_pickups",
         params={
             "search_term": "",
             "sort_field": "date",
@@ -89,7 +93,8 @@ def test_update_missed_waste_pickup_status(client):
         status=MissedWastePickupStatusEnum.REVIEWED,
     )
     response = client.post(
-        "/missed_waste_pickups/update_status", json=payload.model_dump()
+        "/api/waste-management/missed_waste_pickups/update_status",
+        json=payload.model_dump(),
     )
     assert response.status_code == 200
 
@@ -100,7 +105,8 @@ def test_update_missed_waste_pickup_status___failure_not_found(client):
         status=MissedWastePickupStatusEnum.REVIEWED,
     )
     response = client.post(
-        "/missed_waste_pickups/update_status", json=payload.model_dump()
+        "/api/waste-management/missed_waste_pickups/update_status",
+        json=payload.model_dump(),
     )
     assert response.status_code == 404
 
@@ -111,14 +117,15 @@ def test_update_missed_waste_pickup_status___failure_invalid_status(client):
         status=999,
     )
     response = client.post(
-        "/missed_waste_pickups/update_status", json=payload.model_dump()
+        "/api/waste-management/missed_waste_pickups/update_status",
+        json=payload.model_dump(),
     )
     assert response.status_code == 400
 
 
 def test_get_missed_waste_pickup_details___success(client):
     response = client.get(
-        "/missed_waste_pickups/1",
+        "/api/waste-management/missed_waste_pickups/1",
     )
     assert response.status_code == 200
 
@@ -130,20 +137,20 @@ def test_get_missed_waste_pickup_details___success(client):
 
 def test_get_missed_waste_pickup_details___failure_not_found(client):
     response = client.get(
-        "/missed_waste_pickups/9999999",
+        "/api/waste-management/missed_waste_pickups/9999999",
     )
     assert response.status_code == 404
 
 
 def test_get_missed_waste_pickup_details___failure_id_less_than_1(client):
     response = client.get(
-        "/missed_waste_pickups/0",
+        "/api/waste-management/missed_waste_pickups/0",
     )
     assert response.status_code == 400
 
 
 def test_get_missed_waste_pickup_details___failure_id_invalid(client):
     response = client.get(
-        "/missed_waste_pickups/abc",
+        "/api/waste-management/missed_waste_pickups/abc",
     )
     assert response.status_code == 422

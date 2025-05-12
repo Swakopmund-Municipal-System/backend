@@ -17,5 +17,8 @@ COPY ./service /app
 
 RUN pip install --no-cache-dir -r requirements.txt 
 
+# run db migrations
+RUN alembic upgrade head
+
 CMD ["gunicorn", "--bind", "0.0.0.0:8004", "-w", "4", "-k", "uvicorn.workers.UvicornWorker", "run:app"]
 

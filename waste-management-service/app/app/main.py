@@ -31,7 +31,7 @@ def get_db():
 
 
 @app.post(
-    "/missed_waste_pickups/",
+    "/api/waste-management/missed_waste_pickups/",
     responses={
         201: {"description": "Missed waste pickup created successfully."},
         400: {"description": "Invalid input data."},
@@ -58,7 +58,7 @@ def create_missed_waste_pickup(
 
 
 @app.get(
-    "/missed_waste_pickups",
+    "/api/waste-management/missed_waste_pickups",
     response_model=List[MissedWastePickupSearchResultDto],
     responses={200: {"description": "list of missed waste pickups"}},
 )
@@ -85,7 +85,7 @@ def get_missed_waste_pickups(
 
 
 @app.get(
-    "/missed_waste_pickups/{id}",
+    "/api/waste-management/missed_waste_pickups/{id}",
     response_model=MissedWastePickupSearchResultDto,
     responses={
         200: {"description": "details of missed waste pickup"},
@@ -122,7 +122,7 @@ def get_missed_waste_pickup_details(
 
 
 @app.post(
-    "/missed_waste_pickups/update_status",
+    "/api/waste-management/missed_waste_pickups/update_status",
     responses={
         200: {"description": "Status updated successfully."},
         400: {"description": "Invalid input data."},
