@@ -104,11 +104,14 @@ services:
     build:
       context: ./activities-service
       dockerfile: docker-env-prod/app.Dockerfile
+    depends_on:
+      - activities_database
     networks:
       - swakop-backend
     environment:
-      AUTH_SERVICE_URL: ${AUTH_SERVICE_URL}
+      AUTH_SERVICE_URL: ${AUTH_SERVER_URL}
       DATABASE_URL: ${ACTIVITIES_DB_URL}
+    restart: always
 
   auth_database:
     image: postgres:latest
@@ -159,7 +162,9 @@ services:
       - swakop-backend
 
   activities_database:
-    image: postgres:latest
+    image: postgis/postgis:17-3.5
+    restart: always
+    shm_size: 4G
     container_name: swakop-activities-db
     environment:
       POSTGRES_USER: activities_user
