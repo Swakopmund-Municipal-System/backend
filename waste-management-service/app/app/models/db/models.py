@@ -9,4 +9,4 @@ class MissedWastePickups(Base):
     date = Column(TIMESTAMP, index=True)
     address = Column(String, index=False)
     status = Column(Integer, index=False)
-    userId = Column(UUID, index=True)
+    userId = Column(BigInteger, index=True)

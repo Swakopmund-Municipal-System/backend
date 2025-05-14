@@ -3,6 +3,7 @@ import sys
 import os
 import uuid
 
+
 # force add the parent directory to the path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
@@ -14,6 +15,7 @@ from app.main import app, get_db
 from app.database import Base, get_engine, get_session
 from app.models.db.models import MissedWastePickups
 from app.models.enums.enums import MissedWastePickupStatusEnum
+from app.services.auth_service import authentication_override
 
 
 @pytest.fixture(scope="function")
@@ -36,7 +38,7 @@ def test_db():
             date=datetime.datetime.strptime("2023-10-01 12:00:00", "%Y-%m-%d %H:%M:%S"),
             address="123 Main St",
             status=MissedWastePickupStatusEnum.PENDING_REVIEW,
-            userId=uuid.UUID("123e4567-e89b-12d3-a456-426614174000"),
+            userId=1,
         ),
         MissedWastePickups(
             id=2,
@@ -44,7 +46,7 @@ def test_db():
             date=datetime.datetime.strptime("2023-10-02 12:00:00", "%Y-%m-%d %H:%M:%S"),
             address="456 Elm St",
             status=MissedWastePickupStatusEnum.REVIEWED,
-            userId=uuid.UUID("123e4567-e89b-12d3-a456-426614174001"),
+            userId=1,
         ),
     ]
 
@@ -71,7 +73,44 @@ def client(test_db):
         finally:
             test_db.close()
 
+    def override_authenticate_request():
+        return {
+            "app": {
+                "status": "authorised",
+                "application": "test",
+                "resource": "waste-services",
+                "permission": "admin",
+            },
+            "user": {
+                "status": "authorised",
+                "user": {"id": 1, "email": "admin@admin.com"},
+                "permission": "read,write",
+                "user_types": [
+                    "resident",
+                    "tourist",
+                    "property-developer",
+                    "planning-department",
+                    "law-enforcement",
+                    "waste-management",
+                    "health-services",
+                    "community-services",
+                    "business-owner",
+                    "restaurant-owner",
+                    "accommodation-provider",
+                    "building-inspector",
+                    "environmental-officer",
+                    "funeral-home",
+                    "event-organizer",
+                    "library-staff",
+                    "business-support",
+                    "fire-department",
+                ],
+            },
+        }
+
     app.dependency_overrides[get_db] = override_get_db
+    app.dependency_overrides[authentication_override] = override_authenticate_request
+
     from fastapi.testclient import TestClient
 
     return TestClient(app)
