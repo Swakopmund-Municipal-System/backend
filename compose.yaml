@@ -101,6 +101,7 @@ services:
       AUTH_SERVER_URL: ${AUTH_SERVER_URL}
 
   activities:
+    container_name: swakop-activities-service
     build:
       context: ./activities-service
       dockerfile: docker-env-prod/app.Dockerfile
@@ -114,14 +115,18 @@ services:
     restart: always
 
   waste_management:
+    container_name: swakop-waste-management-service
     build:
       context: ./waste-management-service
       dockerfile: docker-env-prod/app.Dockerfile
     networks:
       - swakop-backend
+    depends_on:
+      - waste_management_database
     environment:
       AUTH_SERVICE_URL: ${AUTH_SERVICE_URL}
       DATABASE_URL: ${WASTE_DB_URL}
+    restart: always
 
   auth_database:
     image: postgres:latest
@@ -193,7 +198,7 @@ services:
       POSTGRES_PASSWORD: waste_password
       POSTGRES_DB: waste_management_db
     volumes:
-      - event_db_data:/var/lib/postgresql/data
+      - waste_management_db_data:/var/lib/postgresql/data
     networks:
       - swakop-backend
 
@@ -221,5 +226,6 @@ volumes:
   restaurant_db_data:
   event_db_data:
   activities_db_data:
+  waste_management_db_data:
   auth_static:
   
