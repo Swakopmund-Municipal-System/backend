@@ -14,11 +14,10 @@ RUN apt-get update && apt-get install -y \
     && apt-get clean 
 
 COPY ./service /app
+COPY docker-env-prod/entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
 
 RUN pip install --no-cache-dir -r requirements.txt 
 
-# run db migrations
-RUN alembic upgrade head
-
-CMD ["gunicorn", "--bind", "0.0.0.0:8004", "-w", "4", "-k", "uvicorn.workers.UvicornWorker", "run:app"]
+ENTRYPOINT ["/app/entrypoint.sh"]
 
