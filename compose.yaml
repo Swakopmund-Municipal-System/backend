@@ -4,7 +4,7 @@ services:
     image: nginx:latest
     container_name: swakop-backend
     ports:
-      - "8080:80"
+      - "80:80"
     volumes:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
       - auth_static:/var/www/auth/static
