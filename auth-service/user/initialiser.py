@@ -1,10 +1,3 @@
-import django.db.models.deletion
-import django.utils.timezone
-from django.conf import settings
-from django.db import migrations, models
-
-
-
 def create_initial_user_types(apps, schema_editor):
     """
     Initalise the UserType model with default user types.
@@ -35,6 +28,7 @@ def create_initial_user_types(apps, schema_editor):
         {'name': 'business-owner', 'description': 'Local business owner', 'is_municipal_staff': False},
         {'name': 'restaurant-owner', 'description': 'Restaurant owner/manager', 'is_municipal_staff': False},
         {'name': 'accommodation-provider', 'description': 'Accommodation provider', 'is_municipal_staff': False},
+        {'name': 'activities-provider', 'description': 'Activities provider', 'is_municipal_staff': False},  # Added missing user type
     ]
     
     for type_data in initial_types:
@@ -43,12 +37,15 @@ def create_initial_user_types(apps, schema_editor):
         
         
 def create_initial_user_permissions(apps, schema_editor):
+    """
+    This version creates resources and subresources first, then creates permissions
+    """
     UserType = apps.get_model('user', 'UserType')
     Resource = apps.get_model('application', 'Resource')
     SubResource = apps.get_model('application', 'SubResource')
     UserResourcePermission = apps.get_model('user', 'UserResourcePermission')
 
-    # Create all resources and subresources
+    # Create all resources and subresources first
     create_calendar_services(Resource, SubResource)
     create_activities_services(Resource, SubResource)
     create_places_services(Resource, SubResource)
@@ -237,7 +234,7 @@ def create_initial_user_permissions(apps, schema_editor):
         }
     }
 
-    # Create the permissions
+    # Create the permissions AFTER all resources and subresources are created
     create_permissions(UserResourcePermission, UserType, SubResource, permissions_map)
 
     # Add read permissions to all municipal staff types for all subresources
@@ -265,6 +262,16 @@ def create_calendar_services(Resource, SubResource):
         defaults={
             'description': 'Calendar comments sub resource services',
             'allow_anonymous': True
+        }
+    )
+
+    # Add missing modify-activity-reviews subresource
+    SubResource.objects.get_or_create(
+        resource=calendar_resources,
+        name='modify-activity-reviews',
+        defaults={
+            'description': 'Activity reviews modification services',
+            'allow_anonymous': False
         }
     )
 
@@ -671,21 +678,31 @@ def create_citizen_portal(Resource, SubResource):
 
 def create_permissions(UserResourcePermission, UserType, SubResource, permissions_map):
     for user_type_name, subresources in permissions_map.items():
-        user_type = UserType.objects.get(name=user_type_name)
-        for subresource_name, perms in subresources.items():
-            # Get the subresource by name across all resources
-            subresource = SubResource.objects.get(name=subresource_name)
+        try:
+            user_type = UserType.objects.get(name=user_type_name)
+            for subresource_name, perms in subresources.items():
+                try:
+                    # Get the subresource by name across all resources
+                    subresource = SubResource.objects.get(name=subresource_name)
 
-            # Skip if permission already exists
-            if not UserResourcePermission.objects.filter(
-                user_type=user_type,
-                sub_resource=subresource
-            ).exists():
-                UserResourcePermission.objects.create(
-                    sub_resource=subresource,
-                    permission=perms,
-                    user_type=user_type
-                )
+                    # Skip if permission already exists
+                    if not UserResourcePermission.objects.filter(
+                        user_type=user_type,
+                        sub_resource=subresource
+                    ).exists():
+                        UserResourcePermission.objects.create(
+                            sub_resource=subresource,
+                            permission=perms,
+                            user_type=user_type
+                        )
+                except SubResource.DoesNotExist:
+                    # Log error or handle missing subresource
+                    print(f"Warning: SubResource {subresource_name} does not exist")
+                    continue
+        except UserType.DoesNotExist:
+            # Log error or handle missing user type
+            print(f"Warning: UserType {user_type_name} does not exist")
+            continue
 
 def add_municipal_staff_permissions(UserResourcePermission, UserType, SubResource):
     municipal_staff = UserType.objects.filter(is_municipal_staff=True)
@@ -702,6 +719,4 @@ def add_municipal_staff_permissions(UserResourcePermission, UserType, SubResourc
                     sub_resource=subresource,
                     permission=['read'],  # Basic read access to everything
                     user_type=user_type
-                )                
-     
-        
+                )
