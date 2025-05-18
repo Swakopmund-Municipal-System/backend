@@ -209,7 +209,7 @@ services:
 
   pgweb:
     image: sosedoff/pgweb:latest
-    container_name: database-manager
+    container_name: pgweb
     environment:
       SQLPAD_CONNECTIONS__db1__name: 
     ports:
