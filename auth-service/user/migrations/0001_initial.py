@@ -58,7 +58,5 @@ class Migration(migrations.Migration):
                 'verbose_name_plural': 'users',
                 'abstract': False,
             },
-        ),
-        migrations.RunPython(create_initial_user_types),
-        migrations.RunPython(create_initial_user_permissions)
+        )
 ]
