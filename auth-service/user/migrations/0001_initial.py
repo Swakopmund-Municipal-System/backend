@@ -4,7 +4,7 @@ import django.contrib.postgres.fields
 import django.db.models.deletion
 import django.utils.timezone
 from django.db import migrations, models
-
+from user.initialiser import create_initial_user_permissions, create_initial_user_types
 
 class Migration(migrations.Migration):
 
@@ -59,4 +59,6 @@ class Migration(migrations.Migration):
                 'abstract': False,
             },
         ),
-    ]
+        migrations.RunPython(create_initial_user_types),
+        migrations.RunPython(create_initial_user_permissions)
+]
