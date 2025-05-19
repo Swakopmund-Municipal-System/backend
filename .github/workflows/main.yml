@@ -60,6 +60,8 @@ jobs:
             docker rm swakop-${{ matrix.service }}-service || true
 
             if [ -f "docker-env-dev/docker-compose.yaml" ]; then
+              echo "Cleaning up previous Docker Compose project..."
+              docker compose -f docker-env-dev/docker-compose.yaml down || true
               docker compose -f docker-env-dev/docker-compose.yaml up -d --build
             elif [ -f "docker-env-dev/app.Dockerfile" ]; then
               docker build -f docker-env-dev/app.Dockerfile -t backend-${{ matrix.service }} .
@@ -67,4 +69,5 @@ jobs:
             else
               echo "No Docker deployment config found for ${{ matrix.service }}, skipping..."
             fi
+
 
