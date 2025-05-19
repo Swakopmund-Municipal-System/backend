@@ -66,3 +66,5 @@ jobs:
               docker run -d --name swakop-${{ matrix.service }}-service backend-${{ matrix.service }}
             else
               echo "No Docker deployment config found for ${{ matrix.service }}, skipping..."
+            fi
+
