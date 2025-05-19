@@ -1,0 +1,236 @@
+services:
+
+  nginx:
+    image: nginx:latest
+    container_name: swakop-backend
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+      - auth_static:/var/www/auth/static
+    networks:
+      - swakop-backend
+    environment:
+      NGINX_HOST: localhost
+      NGINX_PORT: 80
+    depends_on:
+      - authentication
+
+  rabbitmq:
+    image: rabbitmq:management
+    container_name: swakop-rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: password
+    networks:
+      - swakop-backend
+
+  authentication:
+    build:
+      context: ./auth-service
+      dockerfile: Dockerfile
+    container_name: swakop-auth-service
+    volumes:
+      - auth_static:/app/staticfiles
+    networks:
+      - swakop-backend
+    depends_on:
+      - auth_database
+    environment:
+      DATABASE: ${AUTH_DB}
+      USER: ${AUTH_USER}
+      PASSWORD: ${AUTH_PASSWORD}
+      HOST: ${AUTH_HOST}
+      PORT: ${AUTH_PORT}
+      SECRET_KEY: ${SECRET_KEY}
+      AUTH_HOST: ${AUTH_HOST}
+      AUTH_SERVER: ${AUTH_SERVER}
+      ENVIRONMENT: ${ENVIRONMENT}
+      PRODUCTION_HOST: ${PRODUCTION_HOST}
+      DJANGO_SUPERUSER_EMAIL: ${DJANGO_SUPERUSER_EMAIL}
+      DJANGO_SUPERUSER_PASSWORD: ${DJANGO_SUPERUSER_PASSWORD}
+      DJANGO_SUPERUSER_IS_STAFF: ${DJANGO_SUPERUSER_IS_STAFF:-True}
+      FORCE_SCRIPT_NAME: /api/auth
+
+  health:
+    build:
+      context: ./health
+      dockerfile: Dockerfile
+    container_name: swakop-health-service
+    networks:
+      - swakop-backend
+    depends_on:
+      - health_database
+    environment:
+      DATABASE: ${HEALTH_DB}
+      USER: ${HEALTH_USER}
+      PASSWORD: ${HEALTH_PASSWORD}
+      HOST: ${HEALTH_HOST}
+      PORT: ${HEALTH_PORT}
+      AUTH_SERVER_URL: ${AUTH_SERVER_URL}
+
+  event:
+    build:
+      context: ./events
+      dockerfile: Dockerfile
+    container_name: swakop-event-service
+    networks:
+      - swakop-backend
+    depends_on:
+      - event_database
+    environment:
+      DATABASE: ${EVENT_DB}
+      USER: ${EVENT_USER}
+      PASSWORD: ${EVENT_PASSWORD}
+      HOST: ${EVENT_HOST}
+      PORT: ${EVENT_PORT}
+      AUTH_SERVER_URL: ${AUTH_SERVER_URL}
+
+  
+  restaurant:
+    build:
+      context: ./restaurant_service_python
+      dockerfile: Dockerfile
+    container_name: swakop-restaurant-service
+    networks:
+      - swakop-backend
+    depends_on:
+      - restaurant_database
+    environment:
+      DATABASE_URL: ${RESTAURANT_DB_URL}
+      AUTH_SERVER_URL: ${AUTH_SERVER_URL}
+
+  activities:
+    container_name: swakop-activities-service
+    build:
+      context: ./activities-service
+      dockerfile: docker-env-prod/app.Dockerfile
+    depends_on:
+      - activities_database
+    networks:
+      - swakop-backend
+    environment:
+      AUTH_SERVICE_URL: ${AUTH_SERVER_URL}
+      DATABASE_URL: ${ACTIVITIES_DB_URL}
+    restart: always
+
+  waste_management:
+    container_name: swakop-waste-management-service
+    build:
+      context: ./waste-management-service
+      dockerfile: docker-env-prod/app.Dockerfile
+    networks:
+      - swakop-backend
+    depends_on:
+      - waste_management_database
+    environment:
+      AUTH_SERVICE_URL: ${AUTH_SERVICE_URL}
+      DATABASE_URL: ${WASTE_DB_URL}
+    restart: always
+
+  auth_database:
+    image: postgres:latest
+    container_name: swakop-auth-db
+    environment:
+      POSTGRES_USER: auth_user
+      POSTGRES_PASSWORD: auth_password
+      POSTGRES_DB: auth_db
+    volumes:
+      - auth_db_data:/var/lib/postgresql/data
+    networks:
+      - swakop-backend
+
+  health_database:
+    image: postgres:latest
+    container_name: swakop-health-db
+    environment:
+      POSTGRES_USER: health_user
+      POSTGRES_PASSWORD: health_password
+      POSTGRES_DB: health_db
+    volumes:
+      - health_db_data:/var/lib/postgresql/data
+    networks:
+      - swakop-backend
+
+  restaurant_database:
+    image: postgres:latest
+    container_name: swakop-restaurant-db
+    environment:
+      POSTGRES_USER: restaurant_user
+      POSTGRES_PASSWORD: restaurant_password
+      POSTGRES_DB: restaurant_db
+    volumes:
+      - restaurant_db_data:/var/lib/postgresql/data
+    networks:
+      - swakop-backend
+
+  event_database:
+    image: postgres:latest
+    container_name: swakop-event-db
+    environment:
+      POSTGRES_USER: event_user
+      POSTGRES_PASSWORD: event_password
+      POSTGRES_DB: event_db
+    volumes:
+      - event_db_data:/var/lib/postgresql/data
+    networks:
+      - swakop-backend
+
+  activities_database:
+    image: postgis/postgis:17-3.5
+    restart: always
+    shm_size: 4G
+    container_name: swakop-activities-db
+    environment:
+      POSTGRES_USER: activities_user
+      POSTGRES_PASSWORD: activities_password
+      POSTGRES_DB: activities_db
+    volumes:
+      - activities_db_data:/var/lib/postgresql/data
+    networks:
+      - swakop-backend
+
+  waste_management_database:
+    image: postgres:latest
+    container_name: swakop-waste-management-db
+    environment:
+      POSTGRES_USER: waste_user
+      POSTGRES_PASSWORD: waste_password
+      POSTGRES_DB: waste_management_db
+    volumes:
+      - waste_management_db_data:/var/lib/postgresql/data
+    networks:
+      - swakop-backend
+
+  pgweb:
+    image: sosedoff/pgweb:latest
+    container_name: pgweb
+    environment:
+      SQLPAD_CONNECTIONS__db1__name: 
+    ports:
+      - "28080:8081"
+    depends_on:
+      - auth_database
+      - health_database
+    networks:
+      - swakop-backend
+
+networks:
+  swakop-backend:
+    driver: bridge
+
+volumes:
+  rabbitmq_data:
+  auth_db_data:
+  health_db_data:
+  restaurant_db_data:
+  event_db_data:
+  activities_db_data:
+  waste_management_db_data:
+  auth_static:
+  

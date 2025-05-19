@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  restaurant-service:
+    build: .
+    ports:
+      - "8002:8002"
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://postgres:postgres@restaurant-db:5432/restaurant_db
+      - AUTH_SERVICE_URL=http://auth-service:8000
+    depends_on:
+      - restaurant-db
+    networks:
+      - swakop-network
+
+  restaurant-db:
+    image: postgres:15
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=restaurant_db
+    volumes:
+      - restaurant-db-data:/var/lib/postgresql/data
+    networks:
+      - swakop-network
+
+volumes:
+  restaurant-db-data:
+
+networks:
+  swakop-network:
+    external: true 
