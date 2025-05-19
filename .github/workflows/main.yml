@@ -1,0 +1,66 @@
+name: CD - Deploy Microservices to Production
+
+on:
+  pull_request:
+    branches: [ main ]
+    types: [ closed ]
+
+jobs:
+  discover-services:
+    name: Discover Microservices
+    if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main'
+    runs-on: ubuntu-latest
+    outputs:
+      services: ${{ steps.set-matrix.outputs.services }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Discover service folders
+        id: set-matrix
+        run: |
+          echo "Finding service folders in root directory..."
+          folders=$(find . -mindepth 1 -maxdepth 1 -type d \
+            \( -name '.github' -o -name '.vscode' -o -name '.git' \) -prune -o -print | sed 's|^\./||')
+          
+          folders=$(echo "$folders" | grep -v -E '^(\.git|\.github|\.vscode|README.md|.dockerignore|compose.yaml)$')
+
+          json_array=$(printf '%s\n' $folders | jq -R . | jq -s -c .)
+          echo "services=$json_array" >> "$GITHUB_OUTPUT"
+
+  deploy:
+    name: Deploy - ${{ matrix.service }}
+    needs: discover-services
+    if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main'
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        service: ${{ fromJson(needs.discover-services.outputs.services) }}
+
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.REMOTE_HOST }}
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            echo "Deploying ${{ matrix.service }}..."
+
+            cd /root/backend/${{ matrix.service }}
+
+            git reset --hard
+            git clean -fd
+            git pull origin dev
+
+            docker stop swakop-${{ matrix.service }}-service || true
+            docker rm swakop-${{ matrix.service }}-service || true
+
+            if [ -f "docker-env-dev/docker-compose.yaml" ]; then
+              docker compose -f docker-env-dev/docker-compose.yaml up -d --build
+            elif [ -f "docker-env-dev/app.Dockerfile" ]; then
+              docker build -f docker-env-dev/app.Dockerfile -t backend-${{ matrix.service }} .
+              docker run -d --name swakop-${{ matrix.service }}-service backend-${{ matrix.service }}
+            else
+              echo "No Docker deployment config found for ${{ matrix.service }}, skipping..."
