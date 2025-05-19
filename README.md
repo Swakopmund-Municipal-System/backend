@@ -49,4 +49,4 @@ To run the backend, ensure you're in the root directory and run the command:
 docker compose up -d --build
 ```
 
-Anytime changes are made to the services, the containers need to be rebuild with the, same command.
+Anytime changes are made to the services, the containers need to be rebuild with the same command.
