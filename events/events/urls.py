@@ -8,6 +8,7 @@ from .views import (
 )
 
 router = DefaultRouter()
+
 router.register(r'events', EventViewSet)
 router.register(r'locations', LocationViewSet)
 router.register(r'organizers', OrganizerViewSet)
