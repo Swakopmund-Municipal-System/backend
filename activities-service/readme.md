@@ -70,10 +70,13 @@
 ## Overview of endpoints:
 
 ### Activities
-- `GET /api/activities/search` - search activities
+- `GET /api/activities/search` - search activities:
+      - ![alt](./docs/images/search-activities.png)
 - `GET /api/activities/search/location` - search activities by lat/long and a radius
 - `GET /api/activities/{id}` - get activity by id
+      - ![alt](./docs/images/get-activity.png)
 - `POST /api/activities` - create activity
+      - ![alt](./docs/images/create-activities.png)
 - `POST /api/activities/edit` - update activity by id
 - `DELETE /api/activities/{id}` - delete activity by id
 
@@ -86,7 +89,9 @@
 
 ### Reviews
 - `GET /api/activities/reviews` - search reviews
+      - ![alt](./docs/images/search-reviews.png)
 - `POST /api/activities/reviews` - create review
+      - ![alt](./docs/images/create-review.png)
 - `DELETE /api/activities/reviews/{id}` - delete review by id
 
 ## Swagger UI

@@ -33,4 +33,13 @@
    ```   
 - all of the endpoints will be listed along with the request and response models
 
+## Overview of endpoints:
 
+### waste-management
+- `GET /api/waste-management/missed_waste_pickups` - search missed waste pickups
+      - ![alt](./docs/images/search-waste.png)
+- `POST /api/waste-management/missed_waste_pickups` - create missed waste pickup
+      - ![alt](./docs/images/create-waste.png)
+- `POST /api/waste-management/update_status` - update status of missed waste pickup by id
+- `GET /api/waste-management/missed_waste_pickups/{id}` - get missed waste pickup by id
+      - ![alt](./docs/images/get-waste.png)
