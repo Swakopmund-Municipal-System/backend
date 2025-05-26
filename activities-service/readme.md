@@ -1,4 +1,8 @@
 
+# Overview
+
+This API service provides endpoints for managing activities, activity images, and reviews. It is built using Python and FastAPI, with PostgreSQL as the database. The service supports searching for activities and reviews, creating and updating activities, uploading images, and managing reviews.
+
 # Docker Development setup
 
 ## Prerequisites

@@ -1,3 +1,7 @@
+# Overview
+
+This API service is designed to manage missed waste pickups. It allows users to create, search, and update the status of missed waste pickups. The service is built using Python and FastAPI, and it uses PostgreSQL as the database.
+
 # Development Setup
 
 - cd into docker-env-dev and run `docker compose up -d`
