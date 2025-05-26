@@ -37,10 +37,6 @@ router.register(r'recurring-patterns', RecurringPatternViewSet)
 router.register(r'event-changes', EventChangeLogViewSet)
 
 # Optional API versioning prefix
-api_urlpatterns = [
-    path('', include(router.urls)),
-]
-
 urlpatterns = [
-    path('api/events/', include(api_urlpatterns)),
+    path('', include(router.urls)),
 ]
