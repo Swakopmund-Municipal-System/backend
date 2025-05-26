@@ -8,10 +8,17 @@ services:
     environment:
       - DATABASE_URL=postgresql+asyncpg://postgres:postgres@restaurant-db:5432/restaurant_db
       - AUTH_SERVICE_URL=http://auth-service:8000
+      - SCRIPT_NAME=/api/restaurants
     depends_on:
-      - restaurant-db
+      restaurant-db:
+        condition: service_healthy
     networks:
-      - swakop-network
+      - restaurant-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8002/docs"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   restaurant-db:
     image: postgres:15
@@ -22,11 +29,16 @@ services:
     volumes:
       - restaurant-db-data:/var/lib/postgresql/data
     networks:
-      - swakop-network
+      - restaurant-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 volumes:
   restaurant-db-data:
 
 networks:
-  swakop-network:
-    external: true 
+  restaurant-network:
+    driver: bridge 

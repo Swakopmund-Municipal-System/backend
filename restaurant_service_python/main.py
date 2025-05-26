@@ -1,4 +1,5 @@
 import os
+import logging
 from fastapi import FastAPI, HTTPException, Depends, Header
 from pydantic import BaseModel
 from typing import List, Optional
@@ -9,6 +10,10 @@ from dotenv import load_dotenv
 from models import Base, RestaurantDB, ReviewDB
 from sqlalchemy.orm import selectinload
 import httpx
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # Load environment variables
 load_dotenv()
@@ -25,7 +30,12 @@ async_session = async_sessionmaker(engine, expire_on_commit=False)
 
 from fastapi.middleware.cors import CORSMiddleware
 
-app = FastAPI(title="Swakopmund Restaurant Service", root_path="/api/restaurants")
+app = FastAPI(
+    title="Swakopmund Restaurant Service",
+    docs_url="/docs",
+    redoc_url="/redoc",
+    openapi_url="/openapi.json"
+)
 
 app.add_middleware(
     CORSMiddleware,
@@ -44,7 +54,7 @@ class Review(BaseModel):
     comment: str
     created_at: datetime
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class RestaurantCreate(BaseModel):
     name: str
@@ -78,7 +88,7 @@ class Restaurant(BaseModel):
     rating: float
     reviews: List[Review] = []
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # Dependency
 async def get_db():
@@ -121,6 +131,21 @@ async def verify_auth(
         except Exception as e:
             raise HTTPException(status_code=401, detail=str(e))
 
+# Initialize database tables
+async def init_db():
+    try:
+        async with engine.begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
+        logger.info("Database tables created successfully")
+    except Exception as e:
+        logger.error(f"Error creating database tables: {str(e)}")
+        raise
+
+# Add startup event
+@app.on_event("startup")
+async def startup_event():
+    await init_db()
+
 @app.get("/", response_model=List[Restaurant])
 async def get_restaurants(
     name: Optional[str] = None,
@@ -128,8 +153,13 @@ async def get_restaurants(
     price_range: Optional[str] = None,
     is_featured: Optional[bool] = None,
     db: AsyncSession = Depends(get_db),
-    _: bool = Depends(verify_auth)
+    x_api_key: str = Header(None),
+    x_resource: str = Header(None)
 ):
+    # Basic API key validation for anonymous access
+    if not x_api_key or not x_resource:
+        raise HTTPException(status_code=401, detail="Missing required headers")
+    
     query = select(RestaurantDB).options(selectinload(RestaurantDB.reviews))
     if name:
         query = query.where(RestaurantDB.name.ilike(f"%{name}%"))
@@ -148,26 +178,40 @@ async def get_featured_restaurants(db: AsyncSession = Depends(get_db)):
     return result.scalars().all()
 
 @app.post("/", response_model=Restaurant, status_code=201)
-async def create_restaurant(restaurant: RestaurantCreate, db: AsyncSession = Depends(get_db)):
-    new_restaurant = RestaurantDB(
-        name=restaurant.name,
-        description=restaurant.description,
-        address=restaurant.address,
-        phone=restaurant.phone,
-        website=restaurant.website,
-        cuisine=restaurant.cuisine,
-        price_range=restaurant.price_range,
-        hours=restaurant.hours,
-        latitude=restaurant.latitude,
-        longitude=restaurant.longitude,
-        image_url=restaurant.image_url,
-        is_featured=restaurant.is_featured,
-        rating=restaurant.rating
-    )
-    db.add(new_restaurant)
-    await db.commit()
-    await db.refresh(new_restaurant)
-    return new_restaurant
+async def create_restaurant(
+    restaurant: RestaurantCreate, 
+    db: AsyncSession = Depends(get_db)
+):
+    try:
+        logger.info(f"Creating new restaurant: {restaurant.name}")
+        new_restaurant = RestaurantDB(
+            name=restaurant.name,
+            description=restaurant.description,
+            address=restaurant.address,
+            phone=restaurant.phone,
+            website=restaurant.website,
+            cuisine=restaurant.cuisine,
+            price_range=restaurant.price_range,
+            hours=restaurant.hours,
+            latitude=restaurant.latitude,
+            longitude=restaurant.longitude,
+            image_url=restaurant.image_url,
+            is_featured=restaurant.is_featured,
+            rating=restaurant.rating
+        )
+        db.add(new_restaurant)
+        await db.commit()
+        await db.refresh(new_restaurant)
+        
+        # Explicitly load the reviews relationship
+        await db.refresh(new_restaurant, ["reviews"])
+        
+        logger.info(f"Successfully created restaurant with ID: {new_restaurant.id}")
+        return new_restaurant
+    except Exception as e:
+        await db.rollback()
+        logger.error(f"Error creating restaurant: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error creating restaurant: {str(e)}")
 
 @app.put("/{restaurant_id}", response_model=Restaurant)
 async def update_restaurant(restaurant_id: int, restaurant: Restaurant, db: AsyncSession = Depends(get_db)):
