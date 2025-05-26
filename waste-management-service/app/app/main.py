@@ -2,6 +2,7 @@ from typing import List
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
+from fastapi.openapi.utils import get_openapi
 
 from app import crud
 from app.database import Base, SessionLocal, get_engine
@@ -19,6 +20,8 @@ app = FastAPI(
     description="Manages waste management operations",
     version="1.0.0",
     openapi_tags=[],
+    openapi_url="/api/waste-management/openapi.json",
+    docs_url="/api/waste-management/docs",
 )
 
 
@@ -145,3 +148,31 @@ def update_missed_waste_pickup_status(
         raise HTTPException(status_code=status_code, detail=err_message)
 
     return {}
+
+
+def custom_openapi():
+    if app.openapi_schema:
+        return app.openapi_schema
+
+    openapi_schema = get_openapi(
+        title=app.title,
+        version=app.version,
+        description=app.description,
+        routes=app.routes,
+    )
+
+    openapi_schema["components"]["securitySchemes"] = {
+        "X-API-KEY": {"type": "apiKey", "in": "header", "name": "X-API-KEY"},
+        "Authorization": {"type": "apiKey", "in": "header", "name": "Authorization"},
+    }
+
+    openapi_schema["security"] = [
+        {"X-API-KEY": []},
+        {"Authorization": []},
+    ]
+
+    app.openapi_schema = openapi_schema
+    return app.openapi_schema
+
+
+app.openapi = custom_openapi

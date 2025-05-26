@@ -20,6 +20,8 @@ app = FastAPI(
     description="Activities Management Service",
     version="1.0.0",
     openapi_tags=[],
+    openapi_url="/api/activities/openapi.json",
+    docs_url="/api/activities/docs",
 )
 
 app.include_router(activity_routes.router, prefix="/api/activities", tags=[])
