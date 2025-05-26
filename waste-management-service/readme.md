@@ -24,6 +24,13 @@
 
 ### OpenAPI and Swagger UI access
 
-- swagger ui can be accessed at `http://localhost:8001/docs` once the app is running.
-- the full OpenAPI spec can be found at `http://localhost:8001/openapi.json` 
+- swagger ui can be accessed at `http://localhost:8004/api/waste-management/docs` once the app is running.
+- the full OpenAPI spec can be found at `http://localhost:8004/api/waste-management/openapi.json` 
+- in the swagger UI, click on the `Authorize` button and enter the following values:
+   ```
+      "X-API-KEY": "the secret api key",
+      "Authorization": "Token <user_token>"
+   ```   
+- all of the endpoints will be listed along with the request and response models
+
 

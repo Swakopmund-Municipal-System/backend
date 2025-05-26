@@ -117,12 +117,17 @@ class UserTypeAdmin(ModelAdmin):
 
 
 class UserResourcePermissionForm(forms.ModelForm):
+    permission = forms.MultipleChoiceField(
+        choices=UserResourcePermission.PERMISSION_CHOICES,
+        widget=forms.CheckboxSelectMultiple,
+        required=False,
+    )
     class Meta:
         model = UserResourcePermission
         fields = '__all__'
-        widgets = {
-            'permission': forms.CheckboxSelectMultiple
-        }
+        # widgets = {
+        #     'permission': forms.CheckboxSelectMultiple
+        # }
 
 @admin.register(UserResourcePermission)
 class UserResourcePermissionAdmin(ModelAdmin):

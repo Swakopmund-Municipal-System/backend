@@ -3,6 +3,7 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 import httpx
 import os
 from starlette.status import HTTP_403_FORBIDDEN, HTTP_401_UNAUTHORIZED
+import json
 
 from app.models.dto.models import AuthenticatedUserDTO
 
@@ -148,13 +149,13 @@ def authenticate_request_with_user(_resource: str, _sub_resource: str, _method: 
         ),
     ):
         if not auth_data.get("user") or not auth_data.get("user").get("user"):
-            raise HTTPException(status_code=401, detail="User authentication required")
+            raise HTTPException(status_code=401, detail=f"User authentication required. user object not found. {json.dumps(auth_data)}")
 
         if not auth_data["user"].get("status") == "authorised":
-            raise HTTPException(status_code=401, detail="User authentication required")
+            raise HTTPException(status_code=401, detail=f"User authentication required. User not authorised. {json.dumps(auth_data)}")
 
         if not auth_data["user"]["user"]["id"] or auth_data["user"]["user"]["id"] == 0:
-            raise HTTPException(status_code=401, detail="User authentication required")
+            raise HTTPException(status_code=401, detail=f"User authentication required. User ID not found. {json.dumps(auth_data)}")
 
         return auth_data
 

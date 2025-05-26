@@ -70,28 +70,28 @@
 ## Overview of endpoints:
 
 ### Activities
-- `GET /activities/search` - search activities
-- `GET /activities/search/location` - search activities by lat/long and a radius
-- `GET /activities/{id}` - get activity by id
-- `POST /activities` - create activity
-- `POST /activities/edit` - update activity by id
-- `DELETE /activities/{id}` - delete activity by id
+- `GET /api/activities/search` - search activities
+- `GET /api/activities/search/location` - search activities by lat/long and a radius
+- `GET /api/activities/{id}` - get activity by id
+- `POST /api/activities` - create activity
+- `POST /api/activities/edit` - update activity by id
+- `DELETE /api/activities/{id}` - delete activity by id
 
 ### Activity Images
-- `GET /activities/images/{id}` - get image by id
-- `GET /activities/images/activity/{id}` - get activity images by activity id
-- `POST /activities/images/activity/{activity_id}/hero/upload` - upload hero image for activity
-- `POST /activities/images/activity/{activity_id}/upload` - upload image for activity
-- `DELETE /activities/images/{id}` - delete image by id
+- `GET /api/activities/images/{id}` - get image by id
+- `GET /api/activities/images/activity/{id}` - get activity images by activity id
+- `POST /api/activities/images/activity/{activity_id}/hero/upload` - upload hero image for activity
+- `POST /api/activities/images/activity/{activity_id}/upload` - upload image for activity
+- `DELETE /api/activities/images/{id}` - delete image by id
 
 ### Reviews
-- `GET /activities/reviews` - search reviews
-- `POST /activities/reviews` - create review
-- `DELETE /activities/reviews/{id}` - delete review by id
+- `GET /api/activities/reviews` - search reviews
+- `POST /api/activities/reviews` - create review
+- `DELETE /api/activities/reviews/{id}` - delete review by id
 
 ## Swagger UI
 
-- open the swagger UI at `http://localhost:8000/docs` to test the application
+- open the swagger UI at `http://localhost:8000/api/activities/docs` to test the application
    - change the port number if necessary
 - in the swagger UI, click on the `Authorize` button and enter the following values:
    ```
@@ -106,7 +106,7 @@ The open api spec can be used to generate clients for use in other applications.
 ```bash
 npm install -g nswag
 
-nswag openapi2tsclient /input:"http://localhost:8000/openapi.json" /output:client.ts /template:Axios /className:ActivitiesClient /OperationGenerationMode:SingleClientFromOperationId 
+nswag openapi2tsclient /input:"http://localhost:8000/api/activities/openapi.json" /output:client.ts /template:Axios /className:ActivitiesClient /OperationGenerationMode:SingleClientFromOperationId 
 ```
 
 The example above uses the nswag npm package to generate a typescript client using the openapi spec. The generated client will use axios as the http client and will be named `ActivitiesClient`. The generated file will be saved as `client.ts` in the current directory. The `OperationGenerationMode` is set to `SingleClientFromOperationId` to generate a single client for each operation id. This can be changed to `MultipleClientsFromOperationId` to generate multiple clients for each operation id.

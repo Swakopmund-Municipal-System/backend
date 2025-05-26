@@ -34,7 +34,7 @@ ENVIRONMENT = os.environ.get("ENVIRONMENT")
 DEBUG = ENVIRONMENT != "production"
 
 if ENVIRONMENT == "production":
-    ALLOWED_HOSTS = [os.environ.get("AUTH_HOST"), os.environ.get("AUTH_SERVER"), os.environ.get("PRODUCTION_HOST")]
+    ALLOWED_HOSTS = [os.environ.get("AUTH_HOST"), os.environ.get("AUTH_SERVER"), os.environ.get("PRODUCTION_HOST"),"localhost", "0.0.0.0"]
 else:
     ALLOWED_HOSTS = []
 
