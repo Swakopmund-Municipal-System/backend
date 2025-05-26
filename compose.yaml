@@ -8,6 +8,7 @@ services:
     volumes:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
       - auth_static:/var/www/auth/static
+      - events_static:/var/www/events/static
     networks:
       - swakop-backend
     environment:
@@ -79,6 +80,8 @@ services:
       context: ./events
       dockerfile: Dockerfile
     container_name: swakop-event-service
+    volumes:
+      - events_static:/app/staticfiles
     networks:
       - swakop-backend
     depends_on:
@@ -237,4 +240,5 @@ volumes:
   activities_db_data:
   waste_management_db_data:
   auth_static:
+  events_static:
   

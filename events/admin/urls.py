@@ -18,7 +18,7 @@ from django.contrib import admin
 from django.urls import path, include
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('api/events/admin/', admin.site.urls),
     # Include the events app URLs
     path('api/events/', include('events.urls')),  # Assuming your app is named 'events'
 ]
