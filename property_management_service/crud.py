@@ -1,6 +1,6 @@
 from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from property_management_service.models import Property, PropertyValuation, PermitApplication
+from models import Property, PropertyValuation, PermitApplication
 
 async def get_property_by_id(session: AsyncSession, property_id: int):
     stmt = select(Property).where(Property.id == property_id)
