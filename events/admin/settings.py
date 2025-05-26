@@ -32,7 +32,7 @@ ENVIRONMENT = os.environ.get('ENVIRONMENT')
 DEBUG = ENVIRONMENT != 'production'
 
 if ENVIRONMENT == 'production':
-    ALLOWED_HOSTS = [os.environ.get('EVENT_HOST'), os.environ.get('EVENT_SERVER'), os.environ.get("PRODUCTION_HOST")]
+    ALLOWED_HOSTS = [os.environ.get('EVENT_HOST'), os.environ.get('EVENT_SERVER'), os.environ.get("PRODUCTION_HOST"),"localhost","0.0.0.0"]
 else:
     ALLOWED_HOSTS = []
 
@@ -133,7 +133,10 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/'
+# STATIC_URL = 'static/'
+STATIC_URL = 'api/events/static/'
+
+STATIC_ROOT = "/app/staticfiles"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

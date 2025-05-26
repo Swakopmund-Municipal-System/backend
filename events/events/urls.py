@@ -1,23 +1,21 @@
 from django.urls import path
 from rest_framework.urlpatterns import format_suffix_patterns
+from rest_framework.routers import DefaultRouter
 from .views import (
     EventViewSet, LocationViewSet, OrganizerViewSet, DepartmentViewSet,
     TagViewSet, AttendeeViewSet, AttachmentViewSet, RecurringPatternViewSet,
     EventChangeLogViewSet
 )
 
+router = DefaultRouter()
+router.register(r'events', EventViewSet)
+router.register(r'locations', LocationViewSet)
+router.register(r'organizers', OrganizerViewSet)
+router.register(r'departments', DepartmentViewSet)
+router.register(r'tags', TagViewSet)
+router.register(r'attendees', AttendeeViewSet)
+router.register(r'attachments', AttachmentViewSet)
+router.register(r'recurring-patterns', RecurringPatternViewSet)
+router.register(r'event-changes', EventChangeLogViewSet)
 
-# Optional API versioning prefix
-urlpatterns = [
-    path('events/', EventViewSet.as_view()),
-    path('locations/', LocationViewSet.as_view()),
-    path('organizers/', OrganizerViewSet.as_view()),
-    path('departments/', DepartmentViewSet.as_view()),
-    path('tags/', TagViewSet.as_view()),
-    path('attendees/', AttendeeViewSet.as_view()),
-    path('attachments/', AttachmentViewSet.as_view()),
-    path('recurring-patterns/', RecurringPatternViewSet.as_view()),
-    path('event-changes/', EventChangeLogViewSet.as_view()),
-]
-
-urlpatterns = format_suffix_patterns(urlpatterns)
+urlpatterns = router.urls
