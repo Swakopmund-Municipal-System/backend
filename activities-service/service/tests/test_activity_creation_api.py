@@ -2,6 +2,8 @@ import os
 import pytest
 from fastapi.testclient import TestClient
 
+from tests.conftest import BASE_TEST_URL
+
 
 def load_test_file(filename):
     filepath = os.path.join("tests", "test_upload_files", filename)
@@ -13,7 +15,7 @@ def test_create_activity_success(client):
     hero = ("hero_image", ("hero.jpg", load_test_file("swk_1.jpg"), "image/jpeg"))
 
     response = client.post(
-        "/activities/",
+        f"{BASE_TEST_URL}/",
         data={
             "name": "Test Activity",
             "description": "This is a test activity",
@@ -33,7 +35,7 @@ def test_create_activity_success(client):
 
 def test_create_activity_missing_required_field(client):
     response = client.post(
-        "/activities/",
+        f"{BASE_TEST_URL}",
         data={
             # Missing 'name' field
             "type": 1,
@@ -49,7 +51,7 @@ def test_create_activity_missing_required_field(client):
 
 def test_create_activity_invalid_lat_long(client):
     response = client.post(
-        "/activities/",
+        f"{BASE_TEST_URL}",
         data={
             "name": "Bad Coordinates",
             "type": 1,
@@ -72,7 +74,7 @@ def test_create_activity_multiple_files(client):
     hero = ("hero_image", ("hero.jpg", load_test_file("swk_1.jpg"), "image/jpeg"))
 
     response = client.post(
-        "/activities/",
+        f"{BASE_TEST_URL}",
         data={
             "name": "Gallery Event",
             "description": "Lots of files",

@@ -3,11 +3,12 @@ import pytest
 from fastapi.testclient import TestClient
 
 from app.models.dto.models import CreateReviewDTO
+from tests.conftest import BASE_TEST_URL
 
 
 def test_get_reviews___success_no_filters(client):
     response = client.get(
-        "/reviews",
+        f"{BASE_TEST_URL}/reviews/",
         params={
             "search_term": "",
             "sort_field": "",
@@ -26,7 +27,7 @@ def test_get_reviews___success_no_filters(client):
 
 def test_get_reviews___success_no_reviews(client):
     response = client.get(
-        "/reviews",
+        f"{BASE_TEST_URL}/reviews/",
         params={
             "search_term": "",
             "sort_field": "",
@@ -45,7 +46,7 @@ def test_get_reviews___success_no_reviews(client):
 
 def test_get_reviews___success_with_search_term_filter(client):
     response = client.get(
-        "/reviews",
+        f"{BASE_TEST_URL}/reviews/",
         params={
             "search_term": "Great festival!",
             "sort_field": "",
@@ -69,7 +70,7 @@ def test_create_review___success(client):
         review="This is a test review",
         rating=5,
     )
-    response = client.post("/reviews", json=payload.model_dump())
+    response = client.post(f"{BASE_TEST_URL}/reviews/", json=payload.model_dump())
     assert response.status_code == 201
 
 
@@ -80,7 +81,7 @@ def test_create_review___failure_empty_review(client):
         rating=2,
     )
     payload.review = ""
-    response = client.post("/reviews", json=payload.model_dump())
+    response = client.post(f"{BASE_TEST_URL}/reviews/", json=payload.model_dump())
     assert response.status_code == 422
 
 
@@ -91,7 +92,7 @@ def test_create_review___failure_invalid_rating(client):
         rating=5,
     )
     payload.rating = 6
-    response = client.post("/reviews", json=payload.model_dump())
+    response = client.post(f"{BASE_TEST_URL}/reviews/", json=payload.model_dump())
     assert response.status_code == 422
 
 
@@ -102,7 +103,7 @@ def test_create_review___failure_missing_fields(client):
         rating=5,
     )
     payload.review = None
-    response = client.post("/reviews", json=payload.model_dump())
+    response = client.post(f"{BASE_TEST_URL}/reviews/", json=payload.model_dump())
     assert response.status_code == 422
 
 
@@ -112,20 +113,20 @@ def test_create_review___failure_invalid_activity_id(client):
         review="This is a test review",
         rating=5,
     )
-    response = client.post("/reviews", json=payload.model_dump())
+    response = client.post(f"{BASE_TEST_URL}/reviews/", json=payload.model_dump())
     assert response.status_code == 404
 
 
 def test_delete_review___success(client):
-    response = client.delete("/reviews/1")
+    response = client.delete(f"{BASE_TEST_URL}/reviews/1")
     assert response.status_code == 200
 
 
 def test_delete_review___failure_not_found(client):
-    response = client.delete("/reviews/9999")
+    response = client.delete(f"{BASE_TEST_URL}/reviews/9999")
     assert response.status_code == 404
 
 
 def test_delete_review___failure_invalid_id(client):
-    response = client.delete("/reviews/invalid_id")
+    response = client.delete(f"{BASE_TEST_URL}/reviews/invalid_id")
     assert response.status_code == 422

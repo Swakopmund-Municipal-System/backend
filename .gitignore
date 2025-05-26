@@ -83,3 +83,7 @@ config_dev.yml
 # Media files (if applicable)
 /media/
 /staticfiles/
+
+# workflows
+.github/
+

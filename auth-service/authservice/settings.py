@@ -34,7 +34,7 @@ ENVIRONMENT = os.environ.get("ENVIRONMENT")
 DEBUG = ENVIRONMENT != "production"
 
 if ENVIRONMENT == "production":
-    ALLOWED_HOSTS = [os.environ.get("AUTH_HOST"), os.environ.get("AUTH_SERVER")]
+    ALLOWED_HOSTS = [os.environ.get("AUTH_HOST"), os.environ.get("AUTH_SERVER"), os.environ.get("PRODUCTION_HOST")]
 else:
     ALLOWED_HOSTS = []
 
@@ -94,16 +94,25 @@ WSGI_APPLICATION = "authservice.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.environ.get("DATABASE"),
-        "USER": os.environ.get("USER"),
-        "PASSWORD": os.environ.get("PASSWORD"),
-        "HOST": os.environ.get("HOST"),
-        "PORT": os.environ.get("PORT"),
+if ENVIRONMENT == "production":
+ 
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": os.environ.get("DATABASE"),
+            "USER": os.environ.get("USER"),
+            "PASSWORD": os.environ.get("PASSWORD"),
+            "HOST": os.environ.get("HOST"),
+            "PORT": os.environ.get("PORT"),
+        }
     }
-}
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
+    }
 
 
 # Password validation
