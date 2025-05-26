@@ -1,0 +1,299 @@
+Attaching to poi_service
+[36mpoi_service       |[0m Traceback (most recent call last):
+[36mpoi_service       |[0m   File "/app/manage.py", line 22, in <module>
+[36mpoi_service       |[0m     main()
+[36mpoi_service       |[0m     ~~~~^^
+[36mpoi_service       |[0m   File "/app/manage.py", line 18, in main
+[36mpoi_service       |[0m     execute_from_command_line(sys.argv)
+[36mpoi_service       |[0m     ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+[36mpoi_service       |[0m   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 442, in execute_from_command_line
+[36mpoi_service       |[0m     utility.execute()
+[36mpoi_service       |[0m     ~~~~~~~~~~~~~~~^^
+[36mpoi_service       |[0m   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 382, in execute
+[36mpoi_service       |[0m     settings.INSTALLED_APPS
+[36mpoi_service       |[0m   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 81, in __getattr__
+[36mpoi_service       |[0m     self._setup(name)
+[36mpoi_service       |[0m     ~~~~~~~~~~~^^^^^^
+[36mpoi_service       |[0m   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 68, in _setup
+[36mpoi_service       |[0m     self._wrapped = Settings(settings_module)
+[36mpoi_service       |[0m                     ~~~~~~~~^^^^^^^^^^^^^^^^^
+[36mpoi_service       |[0m   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 166, in __init__
+[36mpoi_service       |[0m     mod = importlib.import_module(self.SETTINGS_MODULE)
+[36mpoi_service       |[0m   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+[36mpoi_service       |[0m     return _bootstrap._gcd_import(name[level:], package, level)
+[36mpoi_service       |[0m            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[36mpoi_service       |[0m   File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+[36mpoi_service       |[0m   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+[36mpoi_service       |[0m   File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
+[36mpoi_service       |[0m   File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+[36mpoi_service       |[0m   File "<frozen importlib._bootstrap_external>", line 1026, in exec_module
+[36mpoi_service       |[0m   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+[36mpoi_service       |[0m   File "/app/service/settings.py", line 30, in <module>
+[36mpoi_service       |[0m     DEBUG = bool(os.getenv("DEBUG"), default=0)
+[36mpoi_service       |[0m TypeError: bool() takes no keyword arguments
+[36mpoi_service       |[0m Traceback (most recent call last):
+[36mpoi_service       |[0m   File "/app/manage.py", line 22, in <module>
+[36mpoi_service       |[0m     main()
+[36mpoi_service       |[0m     ~~~~^^
+[36mpoi_service       |[0m   File "/app/manage.py", line 18, in main
+[36mpoi_service       |[0m     execute_from_command_line(sys.argv)
+[36mpoi_service       |[0m     ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+[36mpoi_service       |[0m   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 442, in execute_from_command_line
+[36mpoi_service       |[0m     utility.execute()
+[36mpoi_service       |[0m     ~~~~~~~~~~~~~~~^^
+[36mpoi_service       |[0m   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 382, in execute
+[36mpoi_service       |[0m     settings.INSTALLED_APPS
+[36mpoi_service       |[0m   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 81, in __getattr__
+[36mpoi_service       |[0m     self._setup(name)
+[36mpoi_service       |[0m     ~~~~~~~~~~~^^^^^^
+[36mpoi_service       |[0m   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 68, in _setup
+[36mpoi_service       |[0m     self._wrapped = Settings(settings_module)
+[36mpoi_service       |[0m                     ~~~~~~~~^^^^^^^^^^^^^^^^^
+[36mpoi_service       |[0m   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 166, in __init__
+[36mpoi_service       |[0m     mod = importlib.import_module(self.SETTINGS_MODULE)
+[36mpoi_service       |[0m   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+[36mpoi_service       |[0m     return _bootstrap._gcd_import(name[level:], package, level)
+[36mpoi_service       |[0m            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[36mpoi_service       |[0m   File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+[36mpoi_service       |[0m   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+[36mpoi_service       |[0m   File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
+[36mpoi_service       |[0m   File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+[36mpoi_service       |[0m   File "<frozen importlib._bootstrap_external>", line 1026, in exec_module
+[36mpoi_service       |[0m   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+[36mpoi_service       |[0m   File "/app/service/settings.py", line 30, in <module>
+[36mpoi_service       |[0m     DEBUG = bool(os.getenv("DEBUG"), default=0)
+[36mpoi_service       |[0m TypeError: bool() takes no keyword arguments
+[36mpoi_service       |[0m [2025-05-26 21:40:50 +0000] [9] [INFO] Starting gunicorn 23.0.0
+[36mpoi_service       |[0m [2025-05-26 21:40:50 +0000] [9] [INFO] Listening at: http://0.0.0.0:8000 (9)
+[36mpoi_service       |[0m [2025-05-26 21:40:50 +0000] [9] [INFO] Using worker: sync
+[36mpoi_service       |[0m [2025-05-26 21:40:50 +0000] [10] [INFO] Booting worker with pid: 10
+[36mpoi_service       |[0m [2025-05-26 21:40:50 +0000] [11] [INFO] Booting worker with pid: 11
+[36mpoi_service       |[0m [2025-05-26 21:40:50 +0000] [12] [INFO] Booting worker with pid: 12
+[36mpoi_service       |[0m [2025-05-26 21:40:50 +0000] [12] [ERROR] Exception in worker process
+[36mpoi_service       |[0m Traceback (most recent call last):
+[36mpoi_service       |[0m   File "/usr/local/lib/python3.13/site-packages/gunicorn/arbiter.py", line 608, in spawn_worker
+[36mpoi_service       |[0m     worker.init_process()
+[36mpoi_service       |[0m     ~~~~~~~~~~~~~~~~~~~^^
+[36mpoi_service       |[0m   File "/usr/local/lib/python3.13/site-packages/gunicorn/workers/base.py", line 135, in init_process
+[36mpoi_service       |[0m     self.load_wsgi()
+[36mpoi_service       |[0m     ~~~~~~~~~~~~~~^^
+[36mpoi_service       |[0m   File "/usr/local/lib/python3.13/site-packages/gunicorn/workers/base.py", line 147, in load_wsgi
+[36mpoi_service       |[0m     self.wsgi = self.app.wsgi()
+[36mpoi_service       |[0m                 ~~~~~~~~~~~~~^^
+[36mpoi_service       |[0m   File "/usr/local/lib/python3.13/site-packages/gunicorn/app/base.py", line 66, in wsgi
+[36mpoi_service       |[0m     self.callable = self.load()
+[36mpoi_service       |[0m                     ~~~~~~~~~^^
+[36mpoi_service       |[0m   File "/usr/local/lib/python3.13/site-packages/gunicorn/app/wsgiapp.py", line 57, in load
+[36mpoi_service       |[0m     return self.load_wsgiapp()
+[36mpoi_service       |[0m            ~~~~~~~~~~~~~~~~~^^
+[36mpoi_service       |[0m   File "/usr/local/lib/python3.13/site-packages/gunicorn/app/wsgiapp.py", line 47, in load_wsgiapp
+[36mpoi_service       |[0m     return util.import_app(self.app_uri)
+[36mpoi_service       |[0m            ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+[36mpoi_service       |[0m   File "/usr/local/lib/python3.13/site-packages/gunicorn/util.py", line 370, in import_app
+[36mpoi_service       |[0m     mod = importlib.import_module(module)
+[36mpoi_service       |[0m   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+[36mpoi_service       |[0m     return _bootstrap._gcd_import(name[level:], package, level)
+[36mpoi_service       |[0m            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[36mpoi_service       |[0m   File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+[36mpoi_service       |[0m   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+[36mpoi_service       |[0m   File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
+[36mpoi_service       |[0m   File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+[36mpoi_service       |[0m   File "<frozen importlib._bootstrap_external>", line 1026, in exec_module
+[36mpoi_service       |[0m   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+[36mpoi_service       |[0m   File "/app/service/wsgi.py", line 16, in <module>
+[36mpoi_service       |[0m     application = get_wsgi_application()
+[36mpoi_service       |[0m   File "/usr/local/lib/python3.13/site-packages/django/core/wsgi.py", line 12, in get_wsgi_application
+[36mpoi_service       |[0m     django.setup(set_prefix=False)
+[36mpoi_service       |[0m     ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+[36mpoi_service       |[0m   File "/usr/local/lib/python3.13/site-packages/django/__init__.py", line 19, in setup
+[36mpoi_service       |[0m     configure_logging(settings.LOGGING_CONFIG, settings.LOGGING)
+[36mpoi_service       |[0m                       ^^^^^^^^^^^^^^^^^^^^^^^
+[36mpoi_service       |[0m   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 81, in __getattr__
+[36mpoi_service       |[0m     self._setup(name)
+[36mpoi_service       |[0m     ~~~~~~~~~~~^^^^^^
+[36mpoi_service       |[0m   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 68, in _setup
+[36mpoi_service       |[0m     self._wrapped = Settings(settings_module)
+[36mpoi_service       |[0m                     ~~~~~~~~^^^^^^^^^^^^^^^^^
+[36mpoi_service       |[0m   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 166, in __init__
+[36mpoi_service       |[0m     mod = importlib.import_module(self.SETTINGS_MODULE)
+[36mpoi_service       |[0m   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+[36mpoi_service       |[0m     return _bootstrap._gcd_import(name[level:], package, level)
+[36mpoi_service       |[0m            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[36mpoi_service       |[0m   File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+[36mpoi_service       |[0m   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+[36mpoi_service       |[0m   File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
+[36mpoi_service       |[0m   File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+[36mpoi_service       |[0m   File "<frozen importlib._bootstrap_external>", line 1026, in exec_module
+[36mpoi_service       |[0m   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+[36mpoi_service       |[0m   File "/app/service/settings.py", line 30, in <module>
+[36mpoi_service       |[0m     DEBUG = bool(os.getenv("DEBUG"), default=0)
+[36mpoi_service       |[0m TypeError: bool() takes no keyword arguments
+[36mpoi_service       |[0m [2025-05-26 21:40:50 +0000] [12] [INFO] Worker exiting (pid: 12)
+[36mpoi_service       |[0m [2025-05-26 21:40:51 +0000] [10] [ERROR] Exception in worker process
+[36mpoi_service       |[0m Traceback (most recent call last):
+[36mpoi_service       |[0m   File "/usr/local/lib/python3.13/site-packages/gunicorn/arbiter.py", line 608, in spawn_worker
+[36mpoi_service       |[0m     worker.init_process()
+[36mpoi_service       |[0m     ~~~~~~~~~~~~~~~~~~~^^
+[36mpoi_service       |[0m   File "/usr/local/lib/python3.13/site-packages/gunicorn/workers/base.py", line 135, in init_process
+[36mpoi_service       |[0m     self.load_wsgi()
+[36mpoi_service       |[0m     ~~~~~~~~~~~~~~^^
+[36mpoi_service       |[0m   File "/usr/local/lib/python3.13/site-packages/gunicorn/workers/base.py", line 147, in load_wsgi
+[36mpoi_service       |[0m     self.wsgi = self.app.wsgi()
+[36mpoi_service       |[0m                 ~~~~~~~~~~~~~^^
+[36mpoi_service       |[0m   File "/usr/local/lib/python3.13/site-packages/gunicorn/app/base.py", line 66, in wsgi
+[36mpoi_service       |[0m     self.callable = self.load()
+[36mpoi_service       |[0m                     ~~~~~~~~~^^
+[36mpoi_service       |[0m   File "/usr/local/lib/python3.13/site-packages/gunicorn/app/wsgiapp.py", line 57, in load
+[36mpoi_service       |[0m     return self.load_wsgiapp()
+[36mpoi_service       |[0m            ~~~~~~~~~~~~~~~~~^^
+[36mpoi_service       |[0m   File "/usr/local/lib/python3.13/site-packages/gunicorn/app/wsgiapp.py", line 47, in load_wsgiapp
+[36mpoi_service       |[0m     return util.import_app(self.app_uri)
+[36mpoi_service       |[0m            ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+[36mpoi_service       |[0m   File "/usr/local/lib/python3.13/site-packages/gunicorn/util.py", line 370, in import_app
+[36mpoi_service       |[0m     mod = importlib.import_module(module)
+[36mpoi_service       |[0m   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+[36mpoi_service       |[0m     return _bootstrap._gcd_import(name[level:], package, level)
+[36mpoi_service       |[0m            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[36mpoi_service       |[0m   File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+[36mpoi_service       |[0m   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+[36mpoi_service       |[0m   File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
+[36mpoi_service       |[0m   File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+[36mpoi_service       |[0m   File "<frozen importlib._bootstrap_external>", line 1026, in exec_module
+[36mpoi_service       |[0m   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+[36mpoi_service       |[0m   File "/app/service/wsgi.py", line 16, in <module>
+[36mpoi_service       |[0m     application = get_wsgi_application()
+[36mpoi_service       |[0m   File "/usr/local/lib/python3.13/site-packages/django/core/wsgi.py", line 12, in get_wsgi_application
+[36mpoi_service       |[0m     django.setup(set_prefix=False)
+[36mpoi_service       |[0m     ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+[36mpoi_service       |[0m   File "/usr/local/lib/python3.13/site-packages/django/__init__.py", line 19, in setup
+[36mpoi_service       |[0m     configure_logging(settings.LOGGING_CONFIG, settings.LOGGING)
+[36mpoi_service       |[0m                       ^^^^^^^^^^^^^^^^^^^^^^^
+[36mpoi_service       |[0m   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 81, in __getattr__
+[36mpoi_service       |[0m     self._setup(name)
+[36mpoi_service       |[0m     ~~~~~~~~~~~^^^^^^
+[36mpoi_service       |[0m   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 68, in _setup
+[36mpoi_service       |[0m     self._wrapped = Settings(settings_module)
+[36mpoi_service       |[0m                     ~~~~~~~~^^^^^^^^^^^^^^^^^
+[36mpoi_service       |[0m   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 166, in __init__
+[36mpoi_service       |[0m     mod = importlib.import_module(self.SETTINGS_MODULE)
+[36mpoi_service       |[0m   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+[36mpoi_service       |[0m     return _bootstrap._gcd_import(name[level:], package, level)
+[36mpoi_service       |[0m            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[36mpoi_service       |[0m   File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+[36mpoi_service       |[0m   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+[36mpoi_service       |[0m   File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
+[36mpoi_service       |[0m   File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+[36mpoi_service       |[0m   File "<frozen importlib._bootstrap_external>", line 1026, in exec_module
+[36mpoi_service       |[0m   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+[36mpoi_service       |[0m   File "/app/service/settings.py", line 30, in <module>
+[36mpoi_service       |[0m     DEBUG = bool(os.getenv("DEBUG"), default=0)
+[36mpoi_service       |[0m TypeError: bool() takes no keyword arguments
+[36mpoi_service       |[0m [2025-05-26 21:40:51 +0000] [10] [INFO] Worker exiting (pid: 10)
+[36mpoi_service       |[0m [2025-05-26 21:40:51 +0000] [9] [ERROR] Worker (pid:12) exited with code 3
+[36mpoi_service       |[0m [2025-05-26 21:40:51 +0000] [9] [ERROR] Worker (pid:10) was sent SIGTERM!
+[36mpoi_service       |[0m [2025-05-26 21:40:51 +0000] [11] [ERROR] Exception in worker process
+[36mpoi_service       |[0m Traceback (most recent call last):
+[36mpoi_service       |[0m   File "/usr/local/lib/python3.13/site-packages/gunicorn/arbiter.py", line 608, in spawn_worker
+[36mpoi_service       |[0m     worker.init_process()
+[36mpoi_service       |[0m     ~~~~~~~~~~~~~~~~~~~^^
+[36mpoi_service       |[0m   File "/usr/local/lib/python3.13/site-packages/gunicorn/workers/base.py", line 135, in init_process
+[36mpoi_service       |[0m     self.load_wsgi()
+[36mpoi_service       |[0m     ~~~~~~~~~~~~~~^^
+[36mpoi_service       |[0m   File "/usr/local/lib/python3.13/site-packages/gunicorn/workers/base.py", line 147, in load_wsgi
+[36mpoi_service       |[0m     self.wsgi = self.app.wsgi()
+[36mpoi_service       |[0m                 ~~~~~~~~~~~~~^^
+[36mpoi_service       |[0m   File "/usr/local/lib/python3.13/site-packages/gunicorn/app/base.py", line 66, in wsgi
+[36mpoi_service       |[0m     self.callable = self.load()
+[36mpoi_service       |[0m                     ~~~~~~~~~^^
+[36mpoi_service       |[0m   File "/usr/local/lib/python3.13/site-packages/gunicorn/app/wsgiapp.py", line 57, in load
+[36mpoi_service       |[0m     return self.load_wsgiapp()
+[36mpoi_service       |[0m            ~~~~~~~~~~~~~~~~~^^
+[36mpoi_service       |[0m   File "/usr/local/lib/python3.13/site-packages/gunicorn/app/wsgiapp.py", line 47, in load_wsgiapp
+[36mpoi_service       |[0m     return util.import_app(self.app_uri)
+[36mpoi_service       |[0m            ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+[36mpoi_service       |[0m   File "/usr/local/lib/python3.13/site-packages/gunicorn/util.py", line 370, in import_app
+[36mpoi_service       |[0m     mod = importlib.import_module(module)
+[36mpoi_service       |[0m   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+[36mpoi_service       |[0m     return _bootstrap._gcd_import(name[level:], package, level)
+[36mpoi_service       |[0m            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[36mpoi_service       |[0m   File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+[36mpoi_service       |[0m   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+[36mpoi_service       |[0m   File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
+[36mpoi_service       |[0m   File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+[36mpoi_service       |[0m   File "<frozen importlib._bootstrap_external>", line 1026, in exec_module
+[36mpoi_service       |[0m   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+[36mpoi_service       |[0m   File "/app/service/wsgi.py", line 16, in <module>
+[36mpoi_service       |[0m     application = get_wsgi_application()
+[36mpoi_service       |[0m   File "/usr/local/lib/python3.13/site-packages/django/core/wsgi.py", line 12, in get_wsgi_application
+[36mpoi_service       |[0m     django.setup(set_prefix=False)
+[36mpoi_service       |[0m     ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+[36mpoi_service       |[0m   File "/usr/local/lib/python3.13/site-packages/django/__init__.py", line 19, in setup
+[36mpoi_service       |[0m     configure_logging(settings.LOGGING_CONFIG, settings.LOGGING)
+[36mpoi_service       |[0m                       ^^^^^^^^^^^^^^^^^^^^^^^
+[36mpoi_service       |[0m   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 81, in __getattr__
+[36mpoi_service       |[0m     self._setup(name)
+[36mpoi_service       |[0m     ~~~~~~~~~~~^^^^^^
+[36mpoi_service       |[0m   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 68, in _setup
+[36mpoi_service       |[0m     self._wrapped = Settings(settings_module)
+[36mpoi_service       |[0m                     ~~~~~~~~^^^^^^^^^^^^^^^^^
+[36mpoi_service       |[0m   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 166, in __init__
+[36mpoi_service       |[0m     mod = importlib.import_module(self.SETTINGS_MODULE)
+[36mpoi_service       |[0m   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+[36mpoi_service       |[0m     return _bootstrap._gcd_import(name[level:], package, level)
+[36mpoi_service       |[0m            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[36mpoi_service       |[0m   File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+[36mpoi_service       |[0m   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+[36mpoi_service       |[0m   File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
+[36mpoi_service       |[0m   File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+[36mpoi_service       |[0m   File "<frozen importlib._bootstrap_external>", line 1026, in exec_module
+[36mpoi_service       |[0m   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+[36mpoi_service       |[0m   File "/app/service/settings.py", line 30, in <module>
+[36mpoi_service       |[0m     DEBUG = bool(os.getenv("DEBUG"), default=0)
+[36mpoi_service       |[0m TypeError: bool() takes no keyword arguments
+[36mpoi_service       |[0m [2025-05-26 21:40:51 +0000] [11] [INFO] Worker exiting (pid: 11)
+[36mpoi_service       |[0m [2025-05-26 21:40:51 +0000] [9] [ERROR] Worker (pid:11) exited with code 3
+[36mpoi_service       |[0m Traceback (most recent call last):
+[36mpoi_service       |[0m   File "/usr/local/lib/python3.13/site-packages/gunicorn/arbiter.py", line 208, in run
+[36mpoi_service       |[0m     self.sleep()
+[36mpoi_service       |[0m     ~~~~~~~~~~^^
+[36mpoi_service       |[0m   File "/usr/local/lib/python3.13/site-packages/gunicorn/arbiter.py", line 359, in sleep
+[36mpoi_service       |[0m     ready = select.select([self.PIPE[0]], [], [], 1.0)
+[36mpoi_service       |[0m   File "/usr/local/lib/python3.13/site-packages/gunicorn/arbiter.py", line 241, in handle_chld
+[36mpoi_service       |[0m     self.reap_workers()
+[36mpoi_service       |[0m     ~~~~~~~~~~~~~~~~~^^
+[36mpoi_service       |[0m   File "/usr/local/lib/python3.13/site-packages/gunicorn/arbiter.py", line 529, in reap_workers
+[36mpoi_service       |[0m     raise HaltServer(reason, self.WORKER_BOOT_ERROR)
+[36mpoi_service       |[0m gunicorn.errors.HaltServer: <HaltServer 'Worker failed to boot.' 3>
+[36mpoi_service       |[0m 
+[36mpoi_service       |[0m During handling of the above exception, another exception occurred:
+[36mpoi_service       |[0m 
+[36mpoi_service       |[0m Traceback (most recent call last):
+[36mpoi_service       |[0m   File "<frozen runpy>", line 198, in _run_module_as_main
+[36mpoi_service       |[0m   File "<frozen runpy>", line 88, in _run_code
+[36mpoi_service       |[0m   File "/usr/local/lib/python3.13/site-packages/gunicorn/__main__.py", line 10, in <module>
+[36mpoi_service       |[0m     run(prog="gunicorn")
+[36mpoi_service       |[0m     ~~~^^^^^^^^^^^^^^^^^
+[36mpoi_service       |[0m   File "/usr/local/lib/python3.13/site-packages/gunicorn/app/wsgiapp.py", line 66, in run
+[36mpoi_service       |[0m     WSGIApplication("%(prog)s [OPTIONS] [APP_MODULE]", prog=prog).run()
+[36mpoi_service       |[0m     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+[36mpoi_service       |[0m   File "/usr/local/lib/python3.13/site-packages/gunicorn/app/base.py", line 235, in run
+[36mpoi_service       |[0m     super().run()
+[36mpoi_service       |[0m     ~~~~~~~~~~~^^
+[36mpoi_service       |[0m   File "/usr/local/lib/python3.13/site-packages/gunicorn/app/base.py", line 71, in run
+[36mpoi_service       |[0m     Arbiter(self).run()
+[36mpoi_service       |[0m     ~~~~~~~~~~~~~~~~~^^
+[36mpoi_service       |[0m   File "/usr/local/lib/python3.13/site-packages/gunicorn/arbiter.py", line 228, in run
+[36mpoi_service       |[0m     self.halt(reason=inst.reason, exit_status=inst.exit_status)
+[36mpoi_service       |[0m     ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[36mpoi_service       |[0m   File "/usr/local/lib/python3.13/site-packages/gunicorn/arbiter.py", line 341, in halt
+[36mpoi_service       |[0m     self.stop()
+[36mpoi_service       |[0m     ~~~~~~~~~^^
+[36mpoi_service       |[0m   File "/usr/local/lib/python3.13/site-packages/gunicorn/arbiter.py", line 395, in stop
+[36mpoi_service       |[0m     time.sleep(0.1)
+[36mpoi_service       |[0m     ~~~~~~~~~~^^^^^
+[36mpoi_service       |[0m   File "/usr/local/lib/python3.13/site-packages/gunicorn/arbiter.py", line 241, in handle_chld
+[36mpoi_service       |[0m     self.reap_workers()
+[36mpoi_service       |[0m     ~~~~~~~~~~~~~~~~~^^
+[36mpoi_service       |[0m   File "/usr/local/lib/python3.13/site-packages/gunicorn/arbiter.py", line 529, in reap_workers
+[36mpoi_service       |[0m     raise HaltServer(reason, self.WORKER_BOOT_ERROR)
+[36mpoi_service       |[0m gunicorn.errors.HaltServer: <HaltServer 'Worker failed to boot.' 3>
