@@ -1,0 +1,10 @@
+services:
+  weather-service:
+    build: .
+    container_name: weather_service
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    env_file:
+      - .env
