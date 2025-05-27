@@ -3,7 +3,7 @@ services:
     build: .
     container_name: weather_service
     ports:
-      - "8000:8000"
+      - "8002:8002"
     volumes:
       - .:/app
     env_file:
