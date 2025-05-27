@@ -20,15 +20,15 @@ def businesses_public(request):
             return Response(data=serializer.data,status=status.HTTP_201_CREATED)
         return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-@api_view(["GET"])
-def get_tourist_attractions(request):
-    # get data from poi service
-    return Response(data="get data from poi service")
+# @api_view(["GET"])
+# def get_tourist_attractions(request):
+#     # get data from poi service
+#     return Response(data="get data from poi service")
 
-@api_view(["GET"])
-def get_upcoming_events(request):
-    # get data from event sercive
-    return Response(data="get data from event service")
+# @api_view(["GET"])
+# def get_upcoming_events(request):
+#     # get data from event sercive
+#     return Response(data="get data from event service")
 
 
 # Internal

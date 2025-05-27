@@ -5,6 +5,6 @@ urlpatterns = [
         path('businesses/', views.businesses_public),
         path('businesses/admin/', views.get_business_reg_requests),
         path('businesses/admin/<id>', views.reg_request_detail),
-        path('tourism/attractions/', views.get_tourist_attractions),
-        path('tourism/events/', views.get_upcoming_events),
+        # path('tourism/attractions/', views.get_tourist_attractions),
+        # path('tourism/events/', views.get_upcoming_events),
 ]
