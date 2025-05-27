@@ -1,0 +1,16 @@
+services:
+  accommodation-api:
+    build: .
+    container_name: accommodation-api
+    ports:
+      - "8585:8585"
+    volumes:
+      - ./accommodation.db:/app/accommodation.db
+    restart: unless-stopped
+    environment:
+      - PORT=8585
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8585/api/accommodations/')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3 

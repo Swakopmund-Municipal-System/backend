@@ -1,0 +1,41 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+Accommodation
+Description: Provides information about accommodation options in Swakopmund.
+Users: iOS, Android, Web.
+Endpoints
+Name
+Type
+Request data
+Return data
+GetAccommodation
+GET
+name
+List of places to stay
+GetAccommodationDetails
+GET
+id
+Detailed information about the selected accommodation
+AddReview
+POST
+Id
+userId
+rating
+comment
+200 status code if successful
+
+Accommodation:
+AccommodationID (INT, Primary Key)
+Name (VARCHAR)
+Description (TEXT)
+Location (VARCHAR)
+WebsiteUrl (TEXT)
+Mobile (TEXT)
+Telephone (TEXT)
+Email (TEXT)
+AccommodationImages:
+AccommodationPlacesID (INT, PK FK)
+DocumentId (INT PK FK)
