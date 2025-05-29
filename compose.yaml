@@ -74,6 +74,9 @@ services:
       HOST: ${HEALTH_HOST}
       PORT: ${HEALTH_PORT}
       AUTH_SERVER_URL: ${AUTH_SERVER_URL}
+      SECRET_KEY: ${HEALTH_SECRET_KEY}
+      ENVIRONMENT: ${ENVIRONMENT}
+      PRODUCTION_HOST: ${PRODUCTION_HOST}
 
   event:
     build:
@@ -288,6 +291,52 @@ services:
     networks:
       - swakop-backend
 
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: cadvisor
+    ports:
+      - "8080:8080"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    networks:
+      - swakop-backend
+
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: node-exporter
+    ports:
+      - "9100:9100"
+    networks:
+      - swakop-backend
+    pid: "host"
+    volumes:
+      - /:/host:ro,rslave
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: swakop-prometheus
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    networks:
+      - swakop-backend
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: swakop-grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+    networks:
+      - swakop-backend
+    environment:
+      - GF_SERVER_ROOT_URL=/grafana/
+
 networks:
   swakop-backend:
     driver: bridge
@@ -304,4 +353,5 @@ volumes:
   poi_db_data:
   auth_static:
   events_static:
+  grafana-data:
   

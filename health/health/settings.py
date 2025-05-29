@@ -32,7 +32,7 @@ ENVIRONMENT = os.environ.get('ENVIRONMENT')
 DEBUG = ENVIRONMENT != 'production'
 
 if ENVIRONMENT == 'production':
-    ALLOWED_HOSTS = [os.environ.get('HEALTH_HOST')]
+    ALLOWED_HOSTS = [os.environ.get('HEALTH_HOST'), os.environ.get("PRODUCTION_HOST")]
 else:
     ALLOWED_HOSTS = []
 
