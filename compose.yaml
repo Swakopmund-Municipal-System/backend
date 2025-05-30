@@ -202,6 +202,7 @@ services:
     build: 
       context: ./economic_development/eco_dev_service
       dockerfile: Dockerfile
+    container_name: swakop-eco-service
     depends_on:
       - eco_database
     volumes:
@@ -322,7 +323,7 @@ services:
       POSTGRES_PASSWORD: eco_password
       POSTGRES_DB: eco_db
     volumes:
-      - poi_db_data:/var/lib/postgresql/data
+      - eco_db_data:/var/lib/postgresql/data
     networks:
       - swakop-backend
 
@@ -399,6 +400,7 @@ volumes:
   waste_management_db_data:
   property_db_data:
   poi_db_data:
+  eco_db_data:
   auth_static:
   events_static:
   grafana-data:
