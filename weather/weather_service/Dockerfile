@@ -21,7 +21,7 @@ COPY . .
 RUN chmod +x /app/entrypoint.sh
 
 # Expose port (adjust if needed)
-EXPOSE 8002
+EXPOSE 8011
 
 # Start the app
 CMD ["/app/entrypoint.sh"]

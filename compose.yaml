@@ -181,6 +181,42 @@ services:
       DJANGO_ALLOWED_HOSTS: ${POI_DJANGO_ALLOWED_HOSTS}
       DJANGO_CSRF_TRUSTED_ORIGINS: ${POI_DJANGO_CSRF_TRUSTED_ORIGINS}
 
+  weather:
+    build: 
+      context: ./weather/weather_service
+      dockerfile: Dockerfile
+    container_name: swakop-weather-service
+    networks:
+      - swakop-backend
+    environment:
+      DEBUG: ${WEATHER_DEBUG}
+      DJANGO_SECRET_KEY: ${WEATHER_DJANGO_SECRET_KEY}
+      DJANGO_ALLOWED_HOSTS: ${WEATHER_DJANGO_ALLOWED_HOSTS}
+      DJANGO_CSRF_TRUSTED_ORIGINS: ${WEATHER_DJANGO_CSRF_TRUSTED_ORIGINS}
+      API_KEY: ${WEATHER_API_KEY}
+      TIDE_KEY: ${WEATHER_TIDE_KEY}
+      TIDE_CACHE_KEY: ${WEATHER_TIDE_CACHE_KEY}
+      WEATHER_CACHE_KEY: ${WEATHER_CACHE_KEY}
+
+  economic_development:
+    build: 
+      context: ./economic_development/eco_dev_service
+      dockerfile: Dockerfile
+    depends_on:
+      - eco_database
+    volumes:
+      - ./static:/app/staticfiles
+    environment:
+      DEBUG: ${ECO_DEBUG}
+      DJANGO_SECRET_KEY: ${ECO_DJANGO_SECRET_KEY}
+      DJANGO_ALLOWED_HOSTS: ${ECO_DJANGO_ALLOWED_HOSTS}
+      DJANGO_CSRF_TRUSTED_ORIGINS: ${ECO_DJANGO_CSRF_TRUSTED_ORIGINS}
+      DATABASE_HOST: ${ECO_DATABASE_HOST}
+      DATABASE_PORT: ${ECO_DATABASE_PORT}
+      POSTGRES_DB: ${ECO_POSTGRES_DB}
+      POSTGRES_USER: ${ECO_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${ECO_POSTGRES_PASSWORD}
+
   auth_database:
     image: postgres:latest
     container_name: swakop-auth-db
@@ -273,6 +309,18 @@ services:
       POSTGRES_USER: poi_user
       POSTGRES_PASSWORD: poi_password
       POSTGRES_DB: poi_db
+    volumes:
+      - poi_db_data:/var/lib/postgresql/data
+    networks:
+      - swakop-backend
+
+  eco_database:
+    image: postgres:latest
+    container_name: swakop-eco-db
+    environment:
+      POSTGRES_USER: eco_user
+      POSTGRES_PASSWORD: eco_password
+      POSTGRES_DB: eco_db
     volumes:
       - poi_db_data:/var/lib/postgresql/data
     networks:
